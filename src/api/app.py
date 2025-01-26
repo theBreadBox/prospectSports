@@ -1,0 +1,58 @@
+from flask import Flask, request, jsonify, Response
+from dotenv import load_dotenv
+import requests
+import os
+import contextlib
+import json
+from datetime import datetime 
+import sys
+from io import StringIO
+import contextlib
+
+load_dotenv()
+
+app = Flask(__name__)
+
+def connect_to_db():
+    """Connect to the Neon Postgres database"""
+    load_dotenv()
+    return psycopg2.connect('postgresql://neondb_owner:npg_z0aGQALYM5Tt@ep-tiny-brook-a8s12057-pooler.eastus2.azure.neon.tech/neondb?sslmode=require')
+
+
+@app.route('/submitWallet', methods=['POST'])
+def store_wallet_address():
+    """Store the user's wallet address from the front end"""
+    try:
+        # Get the wallet address from the request
+        address = request.json.get('presaleList')
+        
+        if not address:
+            return jsonify({'error': 'Wallet address is required'}), 400
+        
+        # Connect to the database
+        conn = connect_to_db()
+        cur = conn.cursor()
+
+        # Insert the wallet address into the database
+        insert_query = """
+        INSERT INTO presaleList (address)
+        VALUES (%s);
+        """
+        cur.execute(insert_query, (address,))
+        conn.commit()
+
+        cur.close()
+        conn.close()
+
+        return jsonify({'message': 'Wallet address stored successfully'}), 200
+
+    except Exception as e:
+        print(f"Error storing wallet address: {str(e)}")
+        return jsonify({'error': 'Internal Server Error'}), 500
+
+@app.route('/')
+def home():
+    return 'Welcome to AutoTrade API!'
+
+if __name__ == '__main__':
+    app.run(debug=True)

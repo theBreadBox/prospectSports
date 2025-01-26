@@ -28,23 +28,24 @@ export default function Home() {
   const handleSubmit = async () => {
     setLoading(true);
     setMessage('');
-
+  
     try {
-      const response = await fetch('/api/submitData', {
+      const response = await fetch('https://prospectsports.onrender.com/submitWallet', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ address }),
+        body: JSON.stringify({ walletAddress: address }), // Ensure the key matches your backend expectation
       });
-
+  
       if (response.ok) {
         setMessage('Data successfully submitted!');
       } else {
-        setMessage('Failed to submit data. Please try again.');
+        const errorData = await response.json();
+        setMessage(errorData.error || 'Failed to submit data. Please try again.');
       }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
+      console.error('Error submitting data:', error);
       setMessage('An error occurred. Please try again.');
     } finally {
       setLoading(false);
