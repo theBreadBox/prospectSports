@@ -9,6 +9,7 @@ from datetime import datetime
 import sys
 from io import StringIO
 import contextlib
+import psycopg2 
 
 load_dotenv()
 
