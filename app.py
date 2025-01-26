@@ -16,13 +16,18 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app) 
 
-
-
-@app.route('/submitWallet', methods=['POST'])
 def connect_to_db():
     """Connect to the Neon Postgres database"""
     load_dotenv()
-    return psycopg2.connect('postgresql://neondb_owner:npg_z0aGQALYM5Tt@ep-tiny-brook-a8s12057-pooler.eastus2.azure.neon.tech/neondb?sslmode=require')
+    try: 
+        conn = psycopg2.connect('postgresql://neondb_owner:npg_z0aGQALYM5Tt@ep-tiny-brook-a8s12057-pooler.eastus2.azure.neon.tech/neondb?sslmode=require')
+        return conn
+    except Exception as e:
+        print(f"Error connecting to the database: {str(e)}")
+        return None
+
+@app.route('/submitWallet', methods=['POST'])
+
 
 def store_wallet_address():
     """Store the user's wallet address from the front end"""

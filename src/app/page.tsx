@@ -59,8 +59,9 @@ export default function Home() {
       <div className="absolute top-0 left-0 right-0 h-[70vh] bg-gradient-to-b from-[#00ff00] to-transparent opacity-15 blur-[100px]"></div>
       <div className="absolute bottom-0 right-0 w-1/2 h-1/2 bg-gradient-to-tl from-[#00ff00] to-transparent opacity-10 blur-3xl"></div>
       <Navbar />
+      
       {/* Main content */}
-      <main className="relative flex flex-col items-center justify-center z-10 text-white text-center">
+      <main className="relative flex flex-col items-center justify-center z-10 text-white text-center min-h-screen pb-20">
         <div className="flex flex-col items-center gap-8">
           <div className="flex flex-col items-center gap-4">
             <Image
