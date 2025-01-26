@@ -5,14 +5,14 @@ import Link from 'next/link';
 
 const Navbar = () => {
   return (
-    <nav className="bg-black text-white p-4">
+    <nav className="bg-transparent text-white z-50 fixed top-5 left-20 w-full p-4">
       <div className="container mx-auto flex justify-between items-center">
         <div className="flex items-center">
-          <Image src="/proLogo.png" alt="Prospect Logo" width={50} height={50} />
-          <span className="ml-3 text-xl font-bold">Prospect Sports</span>
+          <Image src="/topLogo.png" alt="Prospect Logo" width={200} height={200} />
+          
         </div>
         <ul className="flex space-x-4">
-          <li>
+          {/* <li>
             <Link href="/">
               <a className="hover:text-green-500">Home</a>
             </Link>
@@ -36,7 +36,7 @@ const Navbar = () => {
             <Link href="/contact">
               <a className="hover:text-green-500">Contact</a>
             </Link>
-          </li>
+          </li> */}
         </ul>
       </div>
     </nav>

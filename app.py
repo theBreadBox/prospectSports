@@ -23,12 +23,11 @@ def connect_to_db():
     load_dotenv()
     return psycopg2.connect('postgresql://neondb_owner:npg_z0aGQALYM5Tt@ep-tiny-brook-a8s12057-pooler.eastus2.azure.neon.tech/neondb?sslmode=require')
 
-
 def store_wallet_address():
     """Store the user's wallet address from the front end"""
     try:
         # Get the wallet address from the request
-        address = request.json.get('presaleList')
+        address = request.json.get('walletAddress')
         
         if not address:
             return jsonify({'error': 'Wallet address is required'}), 400
@@ -39,7 +38,7 @@ def store_wallet_address():
 
         # Insert the wallet address into the database
         insert_query = """
-        INSERT INTO presaleList (address)
+        INSERT INTO presaleList (walletAddress)
         VALUES (%s);
         """
         cur.execute(insert_query, (address,))
@@ -56,9 +55,8 @@ def store_wallet_address():
 
 @app.route('/')
 def home():
-    return 'Welcome to AutoTrade API!'
+    return 'Welcome to Prospect Sports API!'
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
-    
