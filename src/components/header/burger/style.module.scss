@@ -1,0 +1,74 @@
+.button {
+    width: 100px;
+    height: 100px;
+    background-color: transparent;
+    
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: fixed;
+    left: 5%;
+    top: 5;
+    transform: translateX(-50%);
+    padding-top: 10px;
+    z-index: 100;
+    cursor: pointer;
+    @media screen and (max-width: 600px) {
+        width: 100px;
+        height: 100px;
+        background-color: transparent;
+        
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        position: fixed;
+        left: 50%;
+        top: 5;
+        transform: translateX(-50%);
+        padding-top: 10px;
+        z-index: 100;
+    }
+
+    p{
+        display: none;
+        color: white;
+        margin: 0px;
+        text-transform: uppercase;
+        transition: color 0.5s;
+    }
+
+    svg{
+        position: absolute;
+        right: 0px;
+        left: 20px;
+        top: 60px;
+        
+
+        line{
+            transition: stroke 0.5s;
+            stroke-width: 10px;
+        }
+    }
+
+    .background{
+        background-color: white;
+        width: 100%;
+        
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: -1;
+        height: 0px;
+        transition: height 0.6s;
+    }
+
+}
+
+@media only screen and (min-width: 600px) {
+    .button{
+        height: 100px;
+        p{
+            display: block;
+        }
+    }
+}
