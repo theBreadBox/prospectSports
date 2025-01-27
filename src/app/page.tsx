@@ -24,6 +24,7 @@ export default function Home() {
   });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [isRegistered, setIsRegistered] = useState(false); // New state variable
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -40,6 +41,7 @@ export default function Home() {
   
       if (response.ok) {
         setMessage('Data successfully submitted!');
+        setIsRegistered(true); // Update state to hide the button
       } else {
         const errorData = await response.json();
         setMessage(errorData.error || 'Failed to submit data. Please try again.');
@@ -125,7 +127,7 @@ export default function Home() {
                       Disconnect
                     </button>
                     
-                    {status === 'connected' && (
+                    {!isRegistered && status === 'connected' && (
                     <button
                     className="rounded-full border border-solid border-white/20 transition-colors flex items-center justify-center bg-white/10 text-white gap-2 hover:bg-[#4ae5fb] hover:text-black text-sm h-10 px-5 font-[family-name:var(--font-roobert)] flex-1"
                       onClick={handleSubmit}
@@ -178,7 +180,7 @@ export default function Home() {
       
      {/* Feedback section */}
      <section className="min-h-screen flex items-center justify-center">
-     {status === 'connected' && (
+     {status === 'connected' && !isRegistered && (
           <button
             onClick={handleSubmit}
             disabled={loading}

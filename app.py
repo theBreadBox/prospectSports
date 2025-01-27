@@ -42,6 +42,14 @@ def store_wallet_address():
         conn = connect_to_db()
         cur = conn.cursor()
 
+          # Check if the wallet address already exists
+        check_query = """
+        SELECT 1 FROM presale_list WHERE wallet_address = %s;
+        """
+        cur.execute(check_query, (address,))
+        if cur.fetchone():
+            return jsonify({'error': 'Wallet address already registered'}), 409
+
         # Insert the wallet address into the database
         insert_query = """
         INSERT INTO presale_list (wallet_address)
