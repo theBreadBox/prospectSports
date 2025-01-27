@@ -33,7 +33,7 @@ def store_wallet_address():
     """Store the user's wallet address from the front end"""
     try:
         # Get the wallet address from the request
-        address = request.json.get('walletAddress')
+        address = request.json.get('wallet_address')
         
         if not address:
             return jsonify({'error': 'Wallet address is required'}), 400
@@ -44,7 +44,7 @@ def store_wallet_address():
 
         # Insert the wallet address into the database
         insert_query = """
-        INSERT INTO presale_list (walletAddress)
+        INSERT INTO presale_list (wallet_address)
         VALUES (%s);
         """
         cur.execute(insert_query, (address,))

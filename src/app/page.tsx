@@ -35,7 +35,7 @@ export default function Home() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ walletAddress: address }), // Ensure the key matches your backend expectation
+        body: JSON.stringify({ wallet_address: address }), // Ensure the key matches your backend expectation
       });
   
       if (response.ok) {
