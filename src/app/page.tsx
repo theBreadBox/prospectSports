@@ -185,14 +185,14 @@ export default function Home() {
         <Feedback />
       </section>
 
-      {/* Explore section */}
+      {/* Explore section
       <section className="min-h-screen flex items-center justify-center">
         <Explore />
-      </section>
+      </section> */}
        {/* MemeGen section */}
-       <section className="relative flex flex-col items-center justify-center z-100 text-white text-center min-h-screen pb-20">
+       {/* <section className="relative flex flex-col items-center justify-center z-100 text-white text-center min-h-screen pb-20">
         <FruitGame />
-      </section>
+      </section> */}
     </div>
 
     
