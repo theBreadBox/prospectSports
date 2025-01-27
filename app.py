@@ -44,7 +44,7 @@ def store_wallet_address():
 
         # Insert the wallet address into the database
         insert_query = """
-        INSERT INTO presaleList (walletAddress)
+        INSERT INTO presale_list (walletAddress)
         VALUES (%s);
         """
         cur.execute(insert_query, (address,))
