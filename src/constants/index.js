@@ -1,28 +1,28 @@
 export const exploreWorlds = [
   {
-    id: 'bitdog-1',
-    imgUrl: '/bitdogOne.png',
-    title: 'Bitdog #7216',
+    id: 'pack-1',
+    imgUrl: '/bbOne.png',
+    title: '',
   },
   {
-    id: 'bitdog-2',
-    imgUrl: '/bitdogTwo.png',
-    title: 'Bitdog #5719',
+    id: 'pack-2',
+    imgUrl: '/Hockey.png',
+    title: '',
   },
   {
-    id: 'bitdog-3',
-    imgUrl: '/bitdogThree.png',
-    title: 'Bitdog #8119',
+    id: 'pack-3',
+    imgUrl: '/Nike.png',
+    title: '',
   },
   {
-    id: 'bitdog-4',
-    imgUrl: '/bitdogFour.png',
-    title: 'Bitdog #1889',
+    id: 'pack-4',
+    imgUrl: '/Rugby.png',
+    title: '',
   },
   {
-    id: 'bitdog-5',
-    imgUrl: '/bitdogFive.png',
-    title: 'Bitdog #9119',
+    id: 'pack-5',
+    imgUrl: '/bbOne.png',
+    title: '',
   },
  
 ];

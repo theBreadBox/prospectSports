@@ -13,6 +13,7 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Explore from "./Explore";
 import Feedback from "./Feedback";
 import Navbar from '../components/Navbar';
+import FruitGame from "../components/FruitGame";
 
 export default function Home() {
   const { logout } = useLoginWithAbstract();
@@ -180,23 +181,18 @@ export default function Home() {
       
      {/* Feedback section */}
      <section className="min-h-screen flex items-center justify-center">
-     {status === 'connected' && !isRegistered && (
-          <button
-            onClick={handleSubmit}
-            disabled={loading}
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mt-4"
-          >
-            {loading ? 'Submitting...' : 'Sign Up for Whitelist'}
-          </button>
-        )}
-        {message && <p>{message}</p>}
-        {/* <Feedback /> */}
+
+        <Feedback />
       </section>
 
-      {/* Explore section
+      {/* Explore section */}
       <section className="min-h-screen flex items-center justify-center">
         <Explore />
-      </section> */}
+      </section>
+       {/* MemeGen section */}
+       <section className="relative flex flex-col items-center justify-center z-100 text-white text-center min-h-screen pb-20">
+        <FruitGame />
+      </section>
     </div>
 
     
