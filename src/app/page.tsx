@@ -3,26 +3,29 @@ import { useState } from 'react';
 import Image from "next/image";
 import {
   useLoginWithAbstract,
-  useWriteContractSponsored,
+  //useWriteContractSponsored,
 } from "@abstract-foundation/agw-react";
-import { useAccount, useWaitForTransactionReceipt } from "wagmi";
-import { getGeneralPaymasterInput } from "viem/zksync";
-import { parseAbi } from "viem";
+import { useAccount, 
+  //useWaitForTransactionReceipt 
+
+} from "wagmi";
+//import { getGeneralPaymasterInput } from "viem/zksync";
+//import { parseAbi } from "viem";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 
-import Explore from "./Explore";
+//import Explore from "./Explore";
 import Feedback from "./Feedback";
 import Navbar from '../components/Navbar';
-import FruitGame from "../components/FruitGame";
+//import FruitGame from "../components/FruitGame";
 
 export default function Home() {
   const { logout } = useLoginWithAbstract();
   const { address, status } = useAccount();
-  const { writeContractSponsored, data: transactionHash } =
-    useWriteContractSponsored();
-  const { data: transactionReceipt } = useWaitForTransactionReceipt({
-    hash: transactionHash,
-  });
+  // const { writeContractSponsored, data: transactionHash } =
+  //   useWriteContractSponsored();
+  // const { data: transactionReceipt } = useWaitForTransactionReceipt({
+  //   hash: transactionHash,
+  // });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [isRegistered, setIsRegistered] = useState(false); // New state variable
@@ -141,7 +144,7 @@ export default function Home() {
                   {message && <p>{message}</p>}
 
                   </div>
-                  {!!transactionReceipt && (
+                  {/* {!!transactionReceipt && (
                     <a
                       href={`https://explorer.testnet.abs.xyz/tx/${transactionReceipt?.transactionHash}`}
                       target="_blank"
@@ -155,7 +158,7 @@ export default function Home() {
                         {transactionReceipt?.transactionHash?.slice(-6)}
                       </p>
                     </a>
-                  )}
+                  )} */}
                 </div>
               </div>
             ) : status === "reconnecting" || status === "connecting" ? (
