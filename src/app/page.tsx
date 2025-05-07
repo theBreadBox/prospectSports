@@ -164,10 +164,7 @@ export default function Home() {
         </div>
       </main>
       
-      {/* Feedback section */}
-      <section className="min-h-screen flex items-center justify-center">
-        <Feedback />
-      </section>
+    
     </div>
   );
 }
