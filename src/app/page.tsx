@@ -136,8 +136,8 @@ export default function Home() {
                 </div>
               </div>
             ) : status === "reconnecting" || status === "connecting" ? (
-              <div className="animate-spin">
-                <Image src="/spinner.svg" alt="Loading" width={24} height={24} />
+              <div>
+                <Image src="/champster.gif" alt="Loading" width={100} height={100} />
               </div>
             ) : (
               <ConnectButton.Custom>
