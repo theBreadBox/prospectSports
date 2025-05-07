@@ -9,7 +9,7 @@ const DynamicWalletProvider = dynamic(() => import("./DynamicWalletProvider"), {
 
 const client = new QueryClient();
 
-export default function NextAbstractWalletProvider({
+export default function WalletProvider({
   children,
 }: {
   children: React.ReactNode;

@@ -5,22 +5,36 @@ import {
   connectorsForWallets,
   darkTheme,
 } from "@rainbow-me/rainbowkit";
-import { abstractWallet } from "@abstract-foundation/agw-react/connectors";
-import { abstractTestnet } from "wagmi/chains";
+import {
+  metaMaskWallet,
+  coinbaseWallet,
+  walletConnectWallet,
+  rainbowWallet,
+  injectedWallet,
+  trustWallet,
+} from "@rainbow-me/rainbowkit/wallets";
 import { createConfig, WagmiProvider } from "wagmi";
 import { http } from "viem";
+import { mainnet, polygon, optimism, arbitrum, base } from "wagmi/chains";
 
 const connectors = connectorsForWallets(
   [
     {
-      groupName: "Abstract",
-      wallets: [abstractWallet],
+      groupName: "Recommended",
+      wallets: [
+        metaMaskWallet,
+        coinbaseWallet,
+        walletConnectWallet,
+        rainbowWallet,
+        trustWallet,
+        injectedWallet,
+      ],
     },
   ],
   {
-    appName: "Rainbowkit Test",
-    projectId: "",
-    appDescription: "",
+    appName: "Prospect",
+    projectId: "YOUR_PROJECT_ID", // Replace with your WalletConnect project ID if needed
+    appDescription: "Connect wallet to register for Prospect",
     appIcon: "",
     appUrl: "",
   }
@@ -28,9 +42,13 @@ const connectors = connectorsForWallets(
 
 export const config = createConfig({
   connectors,
-  chains: [abstractTestnet],
+  chains: [mainnet, polygon, optimism, arbitrum, base],
   transports: {
-    [abstractTestnet.id]: http(),
+    [mainnet.id]: http(),
+    [polygon.id]: http(),
+    [optimism.id]: http(),
+    [arbitrum.id]: http(),
+    [base.id]: http(),
   },
   ssr: true,
 });

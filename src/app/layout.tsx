@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import NextAbstractWalletProvider from "../components/NextAbstractWalletProvider";
+import WalletProvider from "../components/NextAbstractWalletProvider";
 import "./globals.css";
 import "@rainbow-me/rainbowkit/styles.css";
 
@@ -16,7 +16,7 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
-// Abstract Fonts
+// Fonts
 const avenueMono = localFont({
   src: "./fonts/Avenue Mono.ttf",
   variable: "--font-avenue-mono",
@@ -35,8 +35,8 @@ const roobert = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Abstract Global Wallet + RainbowKit",
-  description: "Integrate Abstract Global Wallet with RainbowKit",
+  title: "Prospect - Connect Wallet",
+  description: "Connect your wallet to register for Prospect",
 };
 
 export default function RootLayout({
@@ -49,7 +49,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${avenueMono.variable} ${roobert.variable} antialiased`}
       >
-        <NextAbstractWalletProvider>{children}</NextAbstractWalletProvider>
+        <WalletProvider>{children}</WalletProvider>
       </body>
     </html>
   );

@@ -8,36 +8,23 @@ const Navbar = () => {
     <nav className="bg-transparent text-white z-50 fixed top-5 left-20 w-full p-4">
       <div className="container mx-auto flex justify-between items-center">
         <div className="flex items-center">
+        <a
+        href="https://prospectsports.io" // Replace with your desired URL
+        target="_blank" // Opens the link in a new tab
+        rel="noopener noreferrer" // Security best practice for external links
+        style={{
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          margin: '10px',
+          zIndex: 1000, // Optional: Add some margin
+        }}
+      >
           <Image src="/topLogo.png" alt="Prospect Logo" width={200} height={200} />
+    </a>
           
         </div>
-        <ul className="flex space-x-4">
-          {/* <li>
-            <Link href="/">
-              <a className="hover:text-green-500">Home</a>
-            </Link>
-          </li>
-          <li>
-            <Link href="/about">
-              <a className="hover:text-green-500">About</a>
-            </Link>
-          </li>
-          <li>
-            <Link href="/docs">
-              <a className="hover:text-green-500">Docs</a>
-            </Link>
-          </li>
-          <li>
-            <Link href="/blog">
-              <a className="hover:text-green-500">Blog</a>
-            </Link>
-          </li>
-          <li>
-            <Link href="/contact">
-              <a className="hover:text-green-500">Contact</a>
-            </Link>
-          </li> */}
-        </ul>
+      
       </div>
     </nav>
   );

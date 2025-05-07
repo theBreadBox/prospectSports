@@ -19,7 +19,7 @@
 html, body {
   
   width: auto;
-  background-color: transparent;
+  background-color: black;
   padding-bottom: 50px;
   height: 100%;
   overflow: 'hidden';
@@ -130,7 +130,7 @@ html, body {
 .hero-gradient {
   background: linear-gradient(
     97.86deg,
-    #C9FF58 0%,
+    black 0%,
     #000000 53.65%,
     #000000 100%
   );
@@ -143,7 +143,7 @@ html, body {
   top: 0px;
   right: 0px;
 
-  background: #C9FF58;
+  background: black;
   filter: blur(190px);
 }
 
@@ -194,7 +194,7 @@ html, body {
   left: 0px;
   top: 0px;
 
-  background: #C9FF58;
+  background: black;
   filter: blur(175px);
 }
 

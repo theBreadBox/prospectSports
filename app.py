@@ -20,7 +20,7 @@ def connect_to_db():
     """Connect to the Neon Postgres database"""
     load_dotenv()
     try: 
-        conn = psycopg2.connect('postgresql://neondb_owner:npg_z0aGQALYM5Tt@ep-tiny-brook-a8s12057-pooler.eastus2.azure.neon.tech/neondb?sslmode=require')
+        conn = psycopg2.connect('postgresql://Allowlist_owner:npg_kE1gGq6nbcad@ep-lucky-thunder-a4cg4mvm-pooler.us-east-1.aws.neon.tech/Allowlist?sslmode=require')
         return conn
     except Exception as e:
         print(f"Error connecting to the database: {str(e)}")
@@ -44,7 +44,7 @@ def store_wallet_address():
 
           # Check if the wallet address already exists
         check_query = """
-        SELECT 1 FROM presale_list WHERE wallet_address = %s;
+        SELECT 1 FROM prospect_al WHERE wallet_address = %s;
         """
         cur.execute(check_query, (address,))
         if cur.fetchone():
@@ -52,7 +52,7 @@ def store_wallet_address():
 
         # Insert the wallet address into the database
         insert_query = """
-        INSERT INTO presale_list (wallet_address)
+        INSERT INTO prospect_al (wallet_address)
         VALUES (%s);
         """
         cur.execute(insert_query, (address,))
