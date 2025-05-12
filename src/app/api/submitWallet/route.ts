@@ -8,10 +8,14 @@ const pool = new Pool({
 
 export async function POST(request: Request) {
   try {
-    const { wallet_address } = await request.json();
+    const { wallet_address, email } = await request.json();
 
     if (!wallet_address) {
       return NextResponse.json({ error: 'Wallet address is required' }, { status: 400 });
+    }
+
+    if (!email) {
+      return NextResponse.json({ error: 'Email is required' }, { status: 400 });
     }
 
     // Get a client from the pool
@@ -31,14 +35,14 @@ export async function POST(request: Request) {
         );
       }
 
-      // Insert the new address
+      // Insert the new address with email
       await client.query(
-        'INSERT INTO prospect_al (wallet_address) VALUES ($1)',
-        [wallet_address]
+        'INSERT INTO prospect_al (wallet_address, email) VALUES ($1, $2)',
+        [wallet_address, email]
       );
 
       return NextResponse.json(
-        { message: 'Wallet address stored successfully' },
+        { message: 'Wallet address and email stored successfully' },
         { status: 200 }
       );
     } finally {

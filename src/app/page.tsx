@@ -17,8 +17,14 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [isRegistered, setIsRegistered] = useState(false);
+  const [email, setEmail] = useState('');
 
   const handleSubmit = async () => {
+    if (!email) {
+      setMessage('Email is required');
+      return;
+    }
+    
     setLoading(true);
     setMessage('');
   
@@ -29,7 +35,7 @@ export default function Home() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ wallet_address: address }),
+        body: JSON.stringify({ wallet_address: address, email }),
       });
   
       if (response.ok) {
@@ -100,6 +106,20 @@ export default function Home() {
                     </p>
                     <p className="text-xs text-gray-400 font-mono">{address}</p>
                   </div>
+                  
+                  {!isRegistered && status === 'connected' && (
+                    <div className="w-full">
+                      <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="Enter your email *"
+                        required
+                        className="w-full mb-3 px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#4ae5fb]"
+                      />
+                    </div>
+                  )}
+                  
                   <div className="flex gap-2 w-full">
                     <button
                       className="rounded-full border border-solid border-white/20 transition-colors flex items-center justify-center bg-white/10 text-white gap-2 hover:bg-white/20 text-sm h-10 px-5 font-[family-name:var(--font-roobert)] flex-1"
