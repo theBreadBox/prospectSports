@@ -1,0 +1,98 @@
+.pageContainer {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #000;
+  background-image: linear-gradient(to bottom, #000000, #013538);
+  position: relative;
+  overflow: hidden;
+}
+
+.content {
+  max-width: 800px;
+  padding: 2rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  backdrop-filter: blur(10px);
+  text-align: center;
+  color: white;
+  z-index: 10;
+}
+
+.title {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  background: linear-gradient(to right, #4ae5fb, #00ff00);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.description {
+  font-size: 1.2rem;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.links {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.link {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: white;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.link:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.iframe {
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+  margin-bottom: 1rem;
+  height: calc(100vh - 100px);
+  width: 90%;
+  max-width: 1200px;
+  z-index: 10;
+  background-color: white;
+}
+
+/* Add grid background similar to main page */
+.pageContainer::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(to right, #0f0f0f 1px, transparent 1px),
+    linear-gradient(to bottom, #0f0f0f 1px, transparent 1px);
+  background-size: 4rem 4rem;
+  mask-image: radial-gradient(ellipse 80% 50% at 50% 0%, #000 70%, transparent 110%);
+  z-index: 0;
+}
+
+/* Add gradient effects similar to main page */
+.pageContainer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 70vh;
+  background: linear-gradient(to bottom, #00ff00, transparent);
+  opacity: 0.15;
+  filter: blur(100px);
+  z-index: 0;
+} 

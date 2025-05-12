@@ -1,0 +1,151 @@
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  backdrop-filter: blur(10px);
+  color: white;
+}
+
+.title {
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  background: linear-gradient(to right, #4ae5fb, #00ff00);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.message, .error, .loading {
+  text-align: center;
+  margin: 1rem 0;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.message {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.error {
+  background-color: rgba(255, 0, 0, 0.1);
+  border: 1px solid rgba(255, 0, 0, 0.2);
+  color: #ff6b6b;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+  font-style: italic;
+  color: #ccc;
+}
+
+.statsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.codeContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.label {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  color: #ccc;
+}
+
+.code {
+  font-size: 1.6rem;
+  font-weight: bold;
+  padding: 0.5rem 1rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  color: #4ae5fb;
+}
+
+.copyButton {
+  padding: 0.6rem 1.2rem;
+  background-color: rgba(74, 229, 251, 0.2);
+  border: 1px solid rgba(74, 229, 251, 0.3);
+  border-radius: 8px;
+  color: #4ae5fb;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.copyButton:hover {
+  background-color: rgba(74, 229, 251, 0.3);
+  transform: translateY(-2px);
+}
+
+.copyMessage {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: #4ae5fb;
+}
+
+.stats {
+  display: flex;
+  justify-content: space-between;
+  margin: 1rem 0;
+  padding: 1rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.5rem 1rem;
+}
+
+.statLabel {
+  font-size: 0.9rem;
+  color: #ccc;
+  margin-bottom: 0.3rem;
+}
+
+.statValue {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #00ff00;
+}
+
+.progressContainer {
+  margin-top: 0.5rem;
+}
+
+.progressLabel {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  color: #ccc;
+}
+
+.progressBar {
+  height: 10px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(to right, #4ae5fb, #00ff00);
+  border-radius: 5px;
+  transition: width 0.3s ease;
+} 

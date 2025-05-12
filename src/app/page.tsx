@@ -2,14 +2,24 @@
 
 import OAuth from 'oauth-1.0a';
 import crypto from 'crypto';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from "next/image";
 import { useAccount, useDisconnect } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import Link from "next/link";
 
 import Feedback from "./Feedback";
 import Navbar from '../components/Navbar';
 import TwitterLoginComponent from '../components/twitterLogin';
+
+// Define the referral stats type
+interface ReferralStats {
+  email: string;
+  wallet_address: string;
+  referral_code: string;
+  total_referred: number;
+  remaining_uses: number;
+}
 
 export default function Home() {
   const { address, status } = useAccount();
@@ -18,6 +28,41 @@ export default function Home() {
   const [message, setMessage] = useState('');
   const [isRegistered, setIsRegistered] = useState(false);
   const [email, setEmail] = useState('');
+  const [referralCode, setReferralCode] = useState('');
+  const [userReferralCode, setUserReferralCode] = useState('');
+  const [referralStats, setReferralStats] = useState<ReferralStats | null>(null);
+
+  // Check URL for referral code parameter
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const refCode = urlParams.get('ref');
+      if (refCode) {
+        setReferralCode(refCode);
+      }
+    }
+  }, []);
+
+  // Check if user is already registered
+  useEffect(() => {
+    const checkRegistration = async () => {
+      if (address && status === 'connected') {
+        try {
+          const response = await fetch(`/api/referrals?wallet=${address}`);
+          if (response.ok) {
+            const data = await response.json();
+            setIsRegistered(true);
+            setUserReferralCode(data.stats.referral_code);
+            setReferralStats(data.stats);
+          }
+        } catch (error) {
+          console.error('Error checking registration:', error);
+        }
+      }
+    };
+
+    checkRegistration();
+  }, [address, status]);
 
   const handleSubmit = async () => {
     if (!email) {
@@ -35,12 +80,18 @@ export default function Home() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ wallet_address: address, email }),
+        body: JSON.stringify({ 
+          wallet_address: address, 
+          email,
+          referred_by: referralCode || undefined
+        }),
       });
   
       if (response.ok) {
-        setMessage('Data successfully submitted!');
+        const data = await response.json();
+        setMessage('Registration successful!');
         setIsRegistered(true);
+        setUserReferralCode(data.referral_code);
       } else {
         const errorData = await response.json();
         setMessage(errorData.error || 'Failed to submit data. Please try again.');
@@ -52,7 +103,14 @@ export default function Home() {
       setLoading(false);
     }
   };
-  
+
+  // Function to copy referral link to clipboard
+  const copyReferralLink = () => {
+    const referralLink = `${window.location.origin}?ref=${userReferralCode}`;
+    navigator.clipboard.writeText(referralLink);
+    setMessage('Referral link copied to clipboard!');
+    setTimeout(() => setMessage(''), 3000);
+  };
 
   const TwitterLogin = async () => {
     try {
@@ -70,7 +128,6 @@ export default function Home() {
     }
   };
 
-
   return (
     <div className="relative grid grid-rows-[1fr_auto] min-h-screen pt-20 pb-20 sm:p-20 font-[family-name:var(--font-avenue-mono)] bg-gradient-to-b from-black to-[#013538] overflow-hidden">
       {/* Grids and aurora gradients */}
@@ -78,6 +135,9 @@ export default function Home() {
       <div className="absolute top-0 left-0 right-0 h-[70vh] bg-gradient-to-b from-[#00ff00] to-transparent opacity-15 blur-[100px]"></div>
       <div className="absolute bottom-0 right-0 w-1/2 h-1/2 bg-gradient-to-tl from-[#00ff00] to-transparent opacity-10 blur-3xl"></div>
     
+      {/* Navbar */}
+      <Navbar />
+      
       {/* Main content */}
       <main className="relative flex flex-col items-center justify-center z-10 text-white text-center min-h-screen pb-20">
         <div className="flex flex-row items-center justify-around gap-4 md:gap-8 w-full px-4 sm:px-0" style={{ maxWidth: '1200px' }}>
@@ -117,6 +177,42 @@ export default function Home() {
                         required
                         className="w-full mb-3 px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#4ae5fb]"
                       />
+                      <input
+                        type="text"
+                        value={referralCode}
+                        onChange={(e) => setReferralCode(e.target.value)}
+                        placeholder="Referral code (optional)"
+                        className="w-full mb-3 px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#4ae5fb]"
+                      />
+                    </div>
+                  )}
+                  
+                  {isRegistered && userReferralCode && (
+                    <div className="w-full mt-2 mb-4">
+                      <div className="text-center mb-2">
+                        <p className="text-sm font-medium">Your Referral Code</p>
+                        <p className="text-lg font-bold text-[#4ae5fb]">{userReferralCode}</p>
+                      </div>
+                      
+                      {referralStats && (
+                        <div className="bg-white/5 rounded-lg p-3 mb-3">
+                          <p className="text-sm flex justify-between">
+                            <span>People referred:</span> 
+                            <span className="font-bold">{referralStats.total_referred || 0}</span>
+                          </p>
+                          <p className="text-sm flex justify-between">
+                            <span>Remaining invites:</span> 
+                            <span className="font-bold">{referralStats.remaining_uses || 5}</span>
+                          </p>
+                        </div>
+                      )}
+                      
+                      <button
+                        onClick={copyReferralLink}
+                        className="w-full px-4 py-2 bg-[#4ae5fb]/20 hover:bg-[#4ae5fb]/30 text-[#4ae5fb] rounded-lg transition-colors"
+                      >
+                        Copy Referral Link
+                      </button>
                     </div>
                   )}
                   
@@ -148,11 +244,11 @@ export default function Home() {
                         onClick={handleSubmit}
                         disabled={loading}
                       >
-                        {loading ? 'Submitting...' : 'Register for Presale'}
+                        {loading ? 'Submitting...' : 'Register for Waitlist'}
                       </button>
                     )}
                   </div>
-                  {message && <p className="mt-2 text-sm">{message}</p>}
+                  {message && <p className="mt-2 text-sm text-center">{message}</p>}
                 </div>
               </div>
             ) : status === "reconnecting" || status === "connecting" ? (
@@ -184,7 +280,18 @@ export default function Home() {
         </div>
       </main>
       
-    
+      {/* 3D Navigation Button */}
+      <div className="relative z-10 flex justify-center mb-8">
+        <Link 
+          href="/navigate"
+          className="bg-white/10 border border-[#4ae5fb] text-white px-6 py-3 rounded-lg hover:bg-gradient-to-r hover:from-[#4ae5fb] hover:to-[#00ff00] hover:text-black transition-all duration-300 font-medium text-lg flex items-center gap-2"
+        >
+          <span>Explore in 3D</span>
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+          </svg>
+        </Link>
+      </div>
     </div>
   );
 }
