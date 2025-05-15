@@ -47,7 +47,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${avenueMono.variable} ${roobert.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${avenueMono.variable} ${roobert.variable} antialiased bg-[linear-gradient(to_bottom,#013538,black)] min-h-screen`}
       >
         <WalletProvider>{children}</WalletProvider>
       </body>

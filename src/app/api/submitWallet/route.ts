@@ -14,7 +14,7 @@ function generateReferralCode() {
 
 export async function POST(request: Request) {
   try {
-    const { wallet_address, email, referred_by } = await request.json();
+    const { wallet_address, email, referred_by, nickname } = await request.json();
 
     if (!wallet_address) {
       return NextResponse.json({ error: 'Wallet address is required' }, { status: 400 });
@@ -22,6 +22,10 @@ export async function POST(request: Request) {
 
     if (!email) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 });
+    }
+
+    if (!nickname) {
+      return NextResponse.json({ error: 'Nickname is required' }, { status: 400 });
     }
 
     // Get a client from the pool
@@ -37,6 +41,19 @@ export async function POST(request: Request) {
       if ((checkResult.rowCount ?? 0) > 0) {
         return NextResponse.json(
           { error: 'Wallet address already registered' },
+          { status: 409 }
+        );
+      }
+
+      // Check if email already exists
+      const emailCheckResult = await client.query(
+        'SELECT 1 FROM prospect_al WHERE email = $1',
+        [email]
+      );
+
+      if ((emailCheckResult.rowCount ?? 0) > 0) {
+        return NextResponse.json(
+          { error: 'Email address already registered' },
           { status: 409 }
         );
       }
@@ -75,13 +92,13 @@ export async function POST(request: Request) {
       // Insert the new address with email and referral information
       if (referred_by) {
         await client.query(
-          'INSERT INTO prospect_al (wallet_address, email, referral_code, referred_by) VALUES ($1, $2, $3, $4)',
-          [wallet_address, email, referral_code, referred_by]
+          'INSERT INTO prospect_al (wallet_address, email, referral_code, referred_by, nickname) VALUES ($1, $2, $3, $4, $5)',
+          [wallet_address, email, referral_code, referred_by, nickname]
         );
       } else {
         await client.query(
-          'INSERT INTO prospect_al (wallet_address, email, referral_code) VALUES ($1, $2, $3)',
-          [wallet_address, email, referral_code]
+          'INSERT INTO prospect_al (wallet_address, email, referral_code, nickname) VALUES ($1, $2, $3, $4)',
+          [wallet_address, email, referral_code, nickname]
         );
       }
 

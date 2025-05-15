@@ -28,19 +28,19 @@ export async function GET(request: Request) {
       // Find the user by email, wallet, or referral code
       if (email) {
         const userResult = await client.query(
-          'SELECT id, email, wallet_address, referral_code FROM prospect_al WHERE email = $1',
+          'SELECT id, email, wallet_address, referral_code, nickname FROM prospect_al WHERE email = $1',
           [email]
         );
         userId = userResult.rows[0]?.id;
       } else if (wallet) {
         const userResult = await client.query(
-          'SELECT id, email, wallet_address, referral_code FROM prospect_al WHERE wallet_address = $1',
+          'SELECT id, email, wallet_address, referral_code, nickname FROM prospect_al WHERE wallet_address = $1',
           [wallet]
         );
         userId = userResult.rows[0]?.id;
       } else if (referralCode) {
         const userResult = await client.query(
-          'SELECT id, email, wallet_address, referral_code FROM prospect_al WHERE referral_code = $1',
+          'SELECT id, email, wallet_address, referral_code, nickname FROM prospect_al WHERE referral_code = $1',
           [referralCode]
         );
         userId = userResult.rows[0]?.id;
@@ -59,12 +59,13 @@ export async function GET(request: Request) {
           p.email,
           p.wallet_address,
           p.referral_code,
+          p.nickname,
           COUNT(r.id) AS total_referred,
           5 - COUNT(r.id) AS remaining_uses
         FROM prospect_al p
         LEFT JOIN prospect_al r ON r.referred_by = p.referral_code
         WHERE p.id = $1
-        GROUP BY p.id, p.email, p.wallet_address, p.referral_code`,
+        GROUP BY p.id, p.email, p.wallet_address, p.referral_code, p.nickname`,
         [userId]
       );
 
@@ -72,7 +73,8 @@ export async function GET(request: Request) {
       const referralsResult = await client.query(
         `SELECT 
           r.email AS referred_email,
-          r.wallet_address AS referred_wallet
+          r.wallet_address AS referred_wallet,
+          r.nickname AS referred_nickname
         FROM prospect_al p
         JOIN prospect_al r ON r.referred_by = p.referral_code
         WHERE p.id = $1`,
