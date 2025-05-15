@@ -8,7 +8,7 @@ import Link from "next/link";
 
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
-import ReferralCube from '../../components/ReferralCube.jsx';
+import SimpleReferralCube from '../../components/SimpleReferralCube.jsx';
 
 // Define the referral stats type
 interface ReferralStats {
@@ -204,7 +204,7 @@ export default function ReferralPage() {
               
               {/* Right side - Interactive Cube */}
               <div className="flex-1 h-[500px]">
-                <ReferralCube 
+                <SimpleReferralCube 
                   totalReferred={referralStats?.total_referred || 0}
                   allCompleted={allSidesCompleted}
                 />

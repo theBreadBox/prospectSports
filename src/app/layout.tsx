@@ -20,7 +20,7 @@ const geistMono = localFont({
 const avenueMono = localFont({
   src: "./fonts/Avenue Mono.ttf",
   variable: "--font-avenue-mono",
-  weight: "100, 900",
+  weight: "100 900",
 });
 const roobert = localFont({
   src: [
