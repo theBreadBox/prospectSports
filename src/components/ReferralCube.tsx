@@ -8,12 +8,12 @@ import * as THREE from 'three';
 interface ReferredUser {
   referred_email: string;
   referred_wallet: string;
-  referred_nickname: string;
+  
 }
 
 interface ReferralCubeProps {
   userReferralCode: string | null;
-  nickname: string | null;
+ 
   referralStats: {
     total_referred: number;
     // remaining_uses: number; // We might use this later for more detailed face states
@@ -63,7 +63,7 @@ const DEFAULT_FACE_COLOR = new THREE.Color('#555555'); // Darker grey for defaul
 const USER_FACE_COLOR = new THREE.Color('#444444'); // Slightly different for user face
 const NEON_BORDER_COLOR = '#4ae5fb'; // Color for the neon border
 
-const ReferralCubeComponent: React.FC<ReferralCubeProps> = ({ userReferralCode, nickname, referralStats, referredUsers, neonEffectActive }) => {
+const ReferralCubeComponent: React.FC<ReferralCubeProps> = ({ userReferralCode, referralStats, referredUsers, neonEffectActive }) => {
   const meshRef = useRef<THREE.Mesh>(null!);
   const thumbsUpTexture = useTexture('/Champster_ThumbsUp_Left.png');
   const sittingChampsterTexture = useTexture('/Champster_Sitting_Left.png');
@@ -89,7 +89,7 @@ const ReferralCubeComponent: React.FC<ReferralCubeProps> = ({ userReferralCode, 
     textColor: '#FFFFFF',
     fontSize: 0.18,
     isUserFace: true,
-    displayedText: nickname,
+    
   });
 
   // Referral Faces (Back, Top, Bottom, Right, Left - indices 1 to 5)
@@ -103,7 +103,7 @@ const ReferralCubeComponent: React.FC<ReferralCubeProps> = ({ userReferralCode, 
         textColor: '#FFFFFF',
         fontSize: 0.18,
         isReferralCompleteFace: true,
-        displayedText: referredUser.referred_nickname,
+        
       });
     } else {
       faceDetails.push({
@@ -257,7 +257,7 @@ const ReferralCubeComponent: React.FC<ReferralCubeProps> = ({ userReferralCode, 
 };
 
 const ReferralCube: React.FC<ReferralCubeProps> = (props) => {
-  if (!props.userReferralCode || !props.referralStats || !props.nickname || !props.referredUsers) {
+  if (!props.userReferralCode || !props.referralStats || !props.referredUsers) {
     // Or some other placeholder if needed when not fully loaded
     return <p className="text-center">Loading Cube Data...</p>; 
   }

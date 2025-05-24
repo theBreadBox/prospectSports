@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from "next/image";
 import { useAccount, useDisconnect } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
@@ -9,6 +9,7 @@ import Link from "next/link";
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import SignupCube from '../../components/SignupCube.jsx';
+import TwitterButton from '../../components/TwitterButton';
 
 interface SignupStep {
   completed: boolean;
@@ -30,7 +31,13 @@ export default function Signup() {
     { completed: false, current: false },  // Wallet connect step
     { completed: false, current: false },  // Confirmation step
   ]);
+  const [twitterSignInLoading, setTwitterSignInLoading] = useState(false);
   
+  // Debug logs
+  useEffect(() => {
+    console.log("Current step:", currentStep);
+  }, [currentStep]);
+
   // Check URL for referral code parameter
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -42,15 +49,7 @@ export default function Signup() {
     }
   }, []);
 
-  // Check if user is already connected with wallet
-  useEffect(() => {
-    if (address && status === 'connected') {
-      // Move to step 2 if they're connected
-      advanceStep();
-    }
-  }, [address, status]);
-
-  const advanceStep = () => {
+  const advanceStep = useCallback(() => {
     if (currentStep < steps.length - 1) {
       const newSteps = [...steps];
       newSteps[currentStep].completed = true;
@@ -65,7 +64,13 @@ export default function Signup() {
       setSteps(newSteps);
       setSignupComplete(true);
     }
-  };
+  }, [currentStep, steps]);
+
+  // Check if user is already connected with wallet
+  useEffect(() => {
+    // Log wallet connection status for debugging
+    console.log("Wallet status:", status, "Address:", address, "Current step:", currentStep);
+  }, [address, status, currentStep]);
 
   const handleEmailSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,6 +79,29 @@ export default function Signup() {
       return;
     }
     advanceStep();
+  };
+
+  const handleTwitterSignIn = async () => {
+    setTwitterSignInLoading(true);
+    setMessage('');
+    try {
+      const response = await fetch('/api/x/request-token', { method: 'POST' });
+      if (!response.ok) {
+        const errorData = await response.json();
+        setMessage(errorData.error || 'Failed to initiate Twitter sign-in.');
+        setTwitterSignInLoading(false);
+        return;
+      }
+      const { oauth_token } = await response.json();
+      // Redirect to Twitter authorization URL
+      window.location.href = `https://api.twitter.com/oauth/authorize?oauth_token=${oauth_token}`;
+      // Note: setTwitterSignInLoading(false) might not be reached if redirection happens immediately.
+      // Consider handling this based on redirection behavior or if an error occurs before redirection.
+    } catch (error) {
+      console.error('Error during Twitter sign-in:', error);
+      setMessage('An error occurred during Twitter sign-in. Please try again.');
+      setTwitterSignInLoading(false);
+    }
   };
 
   const handleSubmit = async () => {
@@ -164,12 +192,32 @@ export default function Signup() {
               Buy, Trade and Stake Athlete cards to earn Prospects $CHAMP, using our AI powered Proof-of-Performance (PoP) technology. Exclusively on Avalanche!
             </p>
             
-            <p className="text-lg sm:text-xl mb-10">
+            <p className="text-lg sm:text-xl mb-6">
               PLUS Sign up and download our App to enroll in our #CHAMPSTER loyalty referral program.
             </p>
             
+            {/* Twitter button directly in the intro area */}
+            <button
+              type="button"
+              onClick={handleTwitterSignIn}
+              disabled={twitterSignInLoading}
+              className="w-full py-3 mb-8 rounded-lg bg-[#1DA1F2] text-white font-bold hover:opacity-90 transition-opacity flex items-center justify-center"
+              style={{zIndex: 9999}}
+            >
+              <svg className="mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M22.46 6c-.77.35-1.6.58-2.46.67.9-.53 1.59-1.37 1.92-2.38-.84.5-1.77.86-2.76 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98C8.28 9.09 5.11 7.38 3 4.79c-.37.63-.58 1.37-.58 2.15 0 1.49.75 2.81 1.91 3.56-.71 0-1.37-.22-1.95-.5v.03c0 2.08 1.48 3.82 3.44 4.21a4.22 4.22 0 0 1-1.94.07 4.28 4.28 0 0 0 4 2.98 8.521 8.521 0 0 1-5.33 1.84c-.34 0-.68-.02-1.02-.06C3.44 20.29 5.7 21 8.12 21 16 21 20.33 14.46 20.33 8.79c0-.21 0-.42-.01-.63.84-.6 1.56-1.36 2.14-2.16z" />
+              </svg>
+              {twitterSignInLoading ? 'Connecting...' : 'Sign in with Twitter'}
+            </button>
+            
             {!signupComplete && (
               <div className="bg-white/5 backdrop-blur-sm border border-white/20 rounded-xl p-6 mb-6">
+                <div className="relative flex py-4 items-center my-4">
+                  <div className="flex-grow border-t border-gray-400"></div>
+                  <span className="flex-shrink mx-4 text-gray-400">Or Register With Email</span>
+                  <div className="flex-grow border-t border-gray-400"></div>
+                </div>
+                
                 {currentStep === 0 && (
                   <form onSubmit={handleEmailSubmit}>
                     <div className="mb-4">
@@ -194,6 +242,11 @@ export default function Signup() {
                         placeholder="Enter referral code"
                         className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#4ae5fb]"
                       />
+                    </div>
+                    <div className="relative flex py-5 items-center">
+                        <div className="flex-grow border-t border-gray-400"></div>
+                        <span className="flex-shrink mx-4 text-gray-400">Or</span>
+                        <div className="flex-grow border-t border-gray-400"></div>
                     </div>
                     <button
                       type="submit"

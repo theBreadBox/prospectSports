@@ -4,7 +4,7 @@ import crypto from 'crypto';
 
 // Create a PostgreSQL connection pool
 const pool = new Pool({
-  connectionString: 'postgresql://Allowlist_owner:npg_kE1gGq6nbcad@ep-lucky-thunder-a4cg4mvm-pooler.us-east-1.aws.neon.tech/Allowlist?sslmode=require',
+  connectionString: 'postgresql://neondb_owner:npg_uKGYCtV1pkF5@ep-lucky-rain-a62b2bxo-pooler.us-west-2.aws.neon.tech/neondb?sslmode=require',
 });
 
 // Generate a unique referral code
@@ -14,7 +14,7 @@ function generateReferralCode() {
 
 export async function POST(request: Request) {
   try {
-    const { wallet_address, email, referred_by, nickname } = await request.json();
+    const { wallet_address, email, referred_by} = await request.json();
 
     if (!wallet_address) {
       return NextResponse.json({ error: 'Wallet address is required' }, { status: 400 });
@@ -22,10 +22,6 @@ export async function POST(request: Request) {
 
     if (!email) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 });
-    }
-
-    if (!nickname) {
-      return NextResponse.json({ error: 'Nickname is required' }, { status: 400 });
     }
 
     // Get a client from the pool
@@ -92,13 +88,13 @@ export async function POST(request: Request) {
       // Insert the new address with email and referral information
       if (referred_by) {
         await client.query(
-          'INSERT INTO prospect_al (wallet_address, email, referral_code, referred_by, nickname) VALUES ($1, $2, $3, $4, $5)',
-          [wallet_address, email, referral_code, referred_by, nickname]
+          'INSERT INTO prospect_al (wallet_address, email, referral_code, referred_by) VALUES ($1, $2, $3, $4)',
+          [wallet_address, email, referral_code, referred_by]
         );
       } else {
         await client.query(
-          'INSERT INTO prospect_al (wallet_address, email, referral_code, nickname) VALUES ($1, $2, $3, $4)',
-          [wallet_address, email, referral_code, nickname]
+          'INSERT INTO prospect_al (wallet_address, email, referral_code) VALUES ($1, $2, $3)',
+          [wallet_address, email, referral_code]
         );
       }
 
