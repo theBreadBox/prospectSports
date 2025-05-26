@@ -15,6 +15,9 @@ const config: Config = {
         'teal-dark': "#1D7A85", // Approx. from rgba(29, 122, 133, 0.85)
         'teal-darker': "#10444A", // Approx. from rgba(16, 68, 74, 0.916608)
       },
+      fontFamily: {
+        poppins: ['var(--font-poppins)', 'system-ui', 'sans-serif'],
+      },
       keyframes: {
         popOutCustom: {
           '0%': { 

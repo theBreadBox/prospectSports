@@ -269,13 +269,13 @@ export default function Signup() {
                         
                         <div className="flex gap-4">
                           <button
-                            className="flex-1 py-2 px-4 rounded-lg border border-white/20 hover:bg-white/10 transition-colors"
+                            className="flex-1 w-full py-2 px-6 rounded-lg border border-white/20 hover:bg-white/10 transition-colors"
                             onClick={() => disconnect()}
                           >
                             Disconnect
                           </button>
                           <button
-                            className="flex-1 py-2 px-4 rounded-lg bg-gradient-to-r from-[#4ae5fb] to-[#00ff00] text-black font-bold hover:opacity-90 transition-opacity"
+                            className="flex-1 w-full py-2 px-4 rounded-lg bg-gradient-to-r from-[#4ae5fb] to-[#00ff00] text-black font-bold hover:opacity-90 transition-opacity"
                             onClick={handleSubmit}
                             disabled={loading}
                           >
