@@ -397,7 +397,7 @@ export default function Home() {
   return (
     <div className="bg-[#001118] flex flex-col justify-center items-center w-full min-h-screen font-['Poppins']">
       {/* Sticky Progress Bar */}
-      <div className="sticky top-0 z-50 w-full bg-[#001118] pt-12">
+      <div className="sticky top-0 z-50 w-full bg-[#001118]">
         <div className="w-full max-w-[1080px] mx-auto px-4">
           {!showReferralSteps ? (
             <div className="flex overflow-hidden rounded-full">
@@ -918,7 +918,7 @@ export default function Home() {
                     </div>
                   )}
                   { (!referredUsersList || referredUsersList.length === 0) && (
-                     <p className="text-neutral-mid-80 text-sm">You haven't referred anyone yet. Share your code!</p>
+                     <p className="text-neutral-mid-80 text-sm">You haven&apos;t referred anyone yet. Share your code!</p>
                   )}
                 </div>
 

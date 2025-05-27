@@ -3,12 +3,12 @@ import { Poppins } from "next/font/google";
 import WalletProvider from "../components/NextAbstractWalletProvider";
 import "./globals.css";
 import "@rainbow-me/rainbowkit/styles.css";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
 
-// Update the Poppins font configuration
 const poppins = Poppins({
   subsets: ["latin"],
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
-  variable: "--font-poppins",
   display: "swap",
 });
 
@@ -23,9 +23,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${poppins.variable} font-poppins antialiased bg-[linear-gradient(to_bottom,#013538,black)] min-h-screen`}>
-        <WalletProvider>{children}</WalletProvider>
+    <html lang="en" className={poppins.className}>
+      <body className="bg-[#001118] min-h-screen">
+        <WalletProvider>
+          <Header />
+          <main className="pt-[120px] md:pt-[140px]">
+            {children}
+          </main>
+          <Footer />
+        </WalletProvider>
       </body>
     </html>
   );

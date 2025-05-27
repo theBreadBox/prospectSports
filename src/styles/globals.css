@@ -8,7 +8,6 @@
   
   overflow: 'hidden';
   box-sizing: border-box;
-  font-family: "Fredoka", sans-serif;
   scroll-behavior: smooth;
   background-color: transparent;
   cursor: "boneCursor.png", 16 16, pointer;
@@ -27,7 +26,11 @@ html, body {
           width: 100vw;
 }
 
-
+@layer base {
+  html {
+    font-family: var(--font-poppins);
+  }
+}
 
 @keyframes slideIn {
   from {
