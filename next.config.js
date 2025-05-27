@@ -4,7 +4,8 @@ const nextConfig = {
     domains: [
       'cdn.prod.website-files.com',
       'play.google.com',
-      'apps.apple.com'
+      'apps.apple.com',
+      'i.postimg.cc'
     ],
     remotePatterns: [
       {
@@ -18,6 +19,10 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'apps.apple.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'i.postimg.cc',
       },
     ],
   },
