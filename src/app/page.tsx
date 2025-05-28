@@ -781,24 +781,28 @@ export default function Home() {
             // Referral section
             <div id="referral-section" className="w-full py-6">
               <div className="w-full max-w-[800px] text-center mx-auto mb-6">
-                <motion.h1 
-                  className="font-bold text-[#ffffff] text-[38px] md:text-[60px] leading-tight md:leading-[1.2em] tracking-[-.01em] mt-0 max-w-[600px] mx-auto"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  A real $CHAMP doesn&apos;t&nbsp;gatekeep.
-                </motion.h1>
-                <div className="flex flex-col gap-[12px] mt-4 items-center">
-                  <motion.p 
-                    className="text-neutral-light-10 text-xl md:text-2xl font-semibold"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.1 }}
-                  >
-                    Share your referral code. Earn more&nbsp;$CHAMP
-                  </motion.p>
-                </div>
+                {showReferralSteps && (
+                  <>
+                    <motion.h1 
+                      className="font-bold text-[#ffffff] text-[38px] md:text-[60px] leading-tight md:leading-[1.2em] tracking-[-.01em] mt-0 max-w-[600px] mx-auto"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      A real $CHAMP doesn&apos;t&nbsp;gatekeep.
+                    </motion.h1>
+                    <div className="flex flex-col gap-[12px] mt-4 items-center">
+                      <motion.p 
+                        className="text-neutral-light-10 text-xl md:text-2xl font-semibold"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: 0.1 }}
+                      >
+                        Share your referral code. Earn more&nbsp;$CHAMP
+                      </motion.p>
+                    </div>
+                  </>
+                )}
               </div>
 
               <div className="w-full flex flex-col md:flex-row items-start justify-between gap-8">
