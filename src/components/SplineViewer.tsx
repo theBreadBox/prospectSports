@@ -1,15 +1,10 @@
 import React, { Suspense, useRef, useState, useEffect } from "react";
 import Spline from '@splinetool/react-spline';
+import { ReferredUser } from './ReferralCube';
 
 interface ReferralStats {
   totalReferrals: number;
   activeReferrals: number;
-}
-
-interface ReferredUser {
-  id: string;
-  name: string;
-  joinedAt: string;
 }
 
 interface SplineViewerProps {

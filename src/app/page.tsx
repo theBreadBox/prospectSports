@@ -11,11 +11,19 @@ import Confetti from 'react-confetti';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { Wallet, LogOut, Copy, Check, CheckCircle2 } from "lucide-react";
+import { SplineViewer } from '@/components/SplineViewer';
+import { HeroSection } from '../components/HeroSection';
+import dynamic from 'next/dynamic';
 
 // import Feedback from "./Feedback"; // Assuming this is not used or defined elsewhere
 // import Navbar from '../components/Navbar'; // Assuming this is not used or defined elsewhere
 import TwitterSignInButton from '../components/TwitterButton'; // Make sure this component exists
-import ReferralCube from '../components/ReferralCube'; // Make sure this component exists
+
+// Dynamic import for ReferralCube to avoid SSR issues with Three.js
+const ReferralCube = dynamic(() => import('@/components/ReferralCube'), {
+  ssr: false,
+  loading: () => <p className="text-center">Loading Cube...</p>
+});
 
 // Define the referral stats type
 interface ReferralStats {
@@ -58,6 +66,8 @@ export default function Home() {
   const [codeCopied, setCodeCopied] = useState<boolean>(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(false); // This controls the success message UI
   const [showReferralSteps, setShowReferralSteps] = useState<boolean>(false);
+  const [lastUnlockedFace, setLastUnlockedFace] = useState<number>(0);
+  const [selectedReferralCount, setSelectedReferralCount] = useState<number | null>(null);
 
   // References for animations
   const cubeContainerRef = useRef<HTMLDivElement>(null);
@@ -393,6 +403,43 @@ export default function Home() {
     return "REGISTER"; // Default
   };
 
+  const handleAddReferral = async (email: string) => {
+    if (!email || !email.includes('@')) {
+      setMessage('Please enter a valid email address');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/referrals/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          referrerWallet: address,
+          referredEmail: email,
+        }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setReferredUsersList(prev => [...prev, { referred_email: email, referred_wallet: '' }]);
+        setMessage('Referral added successfully!');
+        // Update referral stats if needed
+        if (referralStats) {
+          setReferralStats({
+            ...referralStats,
+            total_referred: (referralStats.total_referred || 0) + 1
+          });
+        }
+      } else {
+        setMessage('Failed to add referral. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error adding referral:', error);
+      setMessage('An error occurred. Please try again.');
+    }
+  };
 
   return (
     <div className="bg-[#001118] flex flex-col justify-center items-center w-full py-4">
@@ -737,17 +784,56 @@ export default function Home() {
                 </div>
                 
                 <div className="flex flex-col w-full md:w-1/2 items-center" id="registration-form">
-                  <div className="relative w-[350px] h-[350px] flex items-center justify-center" ref={cubeContainerRef}>
-                    <video
-                      ref={videoRef}
-                      src="https://kalapa.agency/prospects_animated_cube.webm"
-                      autoPlay
-                      loop
-                      muted
-                      playsInline
-                      className="w-full h-full object-contain"
-                    />
+                  <div className="w-full h-[400px] relative touch-pan-y overflow-auto" ref={cubeContainerRef}>
+                    {lastUnlockedFace === 0 && selectedReferralCount === null ? (
+                      <video
+                        ref={videoRef}
+                        src="https://kalapa.agency/prospects_animated_cube.webm"
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                        className="w-full h-full object-contain"
+                      />
+                    ) : (
+                      <div className="w-full h-full relative overflow-visible z-10">
+                        <SplineViewer
+                          referralCode={userReferralCode}
+                          onAnimationComplete={() => setShowCubeNeonEffect(true)}
+                        />
+                      </div>
+                    )}
                   </div>
+                  
+                  {/* Referral input form - Only show after success message and first 4 steps */}
+                  {showReferralSteps && completedSteps.length >= 4 && (
+                    <div className="relative w-full mt-4">
+                      <input
+                        type="text"
+                        placeholder="Enter referral email"
+                        className="w-full h-[46px] bg-neutraldark-900 rounded-[10px] border border-solid border-[#00354d] text-neutral-mid-80 pl-4 pr-16"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            handleAddReferral(e.currentTarget.value);
+                            e.currentTarget.value = '';
+                          }
+                        }}
+                      />
+                      <button
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 px-3 bg-[#59ff83] text-[#092a36] rounded-full text-sm"
+                        onClick={() => {
+                          const input = document.querySelector('input[placeholder="Enter referral email"]') as HTMLInputElement;
+                          if (input) {
+                            handleAddReferral(input.value);
+                            input.value = '';
+                          }
+                        }}
+                      >
+                        Add
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             ) : (
@@ -781,28 +867,24 @@ export default function Home() {
             // Referral section
             <div id="referral-section" className="w-full py-6">
               <div className="w-full max-w-[800px] text-center mx-auto mb-6">
-                {showReferralSteps && (
-                  <>
-                    <motion.h1 
-                      className="font-bold text-[#ffffff] text-[38px] md:text-[60px] leading-tight md:leading-[1.2em] tracking-[-.01em] mt-0 max-w-[600px] mx-auto"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.5 }}
-                    >
-                      A real $CHAMP doesn&apos;t&nbsp;gatekeep.
-                    </motion.h1>
-                    <div className="flex flex-col gap-[12px] mt-4 items-center">
-                      <motion.p 
-                        className="text-neutral-light-10 text-xl md:text-2xl font-semibold"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.1 }}
-                      >
-                        Share your referral code. Earn more&nbsp;$CHAMP
-                      </motion.p>
-                    </div>
-                  </>
-                )}
+                <motion.h1 
+                  className="font-bold text-[#ffffff] text-[38px] md:text-[60px] leading-tight md:leading-[1.2em] tracking-[-.01em] mt-0 max-w-[600px] mx-auto"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  A real $CHAMP doesn&apos;t&nbsp;gatekeep.
+                </motion.h1>
+                <div className="flex flex-col gap-[12px] mt-4 items-center">
+                  <motion.p 
+                    className="text-neutral-light-10 text-xl md:text-2xl font-semibold"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.1 }}
+                  >
+                    Share your referral code. Earn more&nbsp;$CHAMP
+                  </motion.p>
+                </div>
               </div>
 
               <div className="w-full flex flex-col md:flex-row items-start justify-between gap-8">
@@ -979,6 +1061,11 @@ export default function Home() {
           </h2>
         </div>
       )}
+
+      {/* Hero Banner moved to bottom of the page */}
+      <div className="w-full mt-6 mb-6 max-w-[1080px] mx-auto" ref={heroRef}>
+        <HeroSection />
+      </div>
     </div>
   );
 }

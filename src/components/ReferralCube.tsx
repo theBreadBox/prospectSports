@@ -5,10 +5,9 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { Box, Text, OrbitControls, useTexture, Plane, Edges } from '@react-three/drei';
 import * as THREE from 'three';
 
-interface ReferredUser {
+export interface ReferredUser {
   referred_email: string;
   referred_wallet: string;
-  
 }
 
 interface ReferralCubeProps {
@@ -258,7 +257,6 @@ const ReferralCubeComponent: React.FC<ReferralCubeProps> = ({ userReferralCode, 
 
 const ReferralCube: React.FC<ReferralCubeProps> = (props) => {
   if (!props.userReferralCode || !props.referralStats || !props.referredUsers) {
-    // Or some other placeholder if needed when not fully loaded
     return <p className="text-center">Loading Cube Data...</p>; 
   }
 
