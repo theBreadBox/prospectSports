@@ -10,7 +10,7 @@ const SocialIcons = ({ variant = 'header' }: SocialIconsProps) => {
   return (
     <div className="flex items-center space-x-4">
       <a
-        href="https://twitter.com/Prospect_Labs" 
+        href="https://x.com/ProspectSportsX" 
         target="_blank"
         rel="noopener noreferrer"
         className={cn(
