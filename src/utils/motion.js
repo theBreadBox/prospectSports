@@ -87,7 +87,7 @@ export const textVariant2 = {
     },
   },
 };
-
+//comment for commit
 
 
 export const fadeIn = (direction, type, delay, duration) => ({
