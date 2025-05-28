@@ -395,7 +395,7 @@ export default function Home() {
 
 
   return (
-    <div className="bg-[#001118] flex flex-col justify-center items-center w-full min-h-screen font-['Poppins']">
+    <div className="bg-[#001118] flex flex-col justify-center items-center w-full py-4">
       {/* Sticky Progress Bar */}
       <div className="sticky top-0 z-50 w-full bg-[#001118]">
         <div className="w-full max-w-[1080px] mx-auto px-4">
@@ -459,7 +459,7 @@ export default function Home() {
         </div>
         </div>
 
-      <div className="bg-[#001118] w-full max-w-[1080px] px-4 md:px-8 lg:px-12 mt-8">
+      <div className="bg-[#001118] w-full max-w-[1080px] px-4 md:px-8 lg:px-12">
         <div className="flex flex-col w-full items-center relative">
           {!isFormComplete ? (
             !showSuccessMessage ? (

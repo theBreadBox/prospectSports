@@ -9,7 +9,7 @@ const Footer = () => {
       <div className="container-default max-w-[1250px] mx-auto px-[24px] border-t border-[#ffffff1a]">
         <div className="flex flex-col md:flex-row justify-between items-center mt-10 mb-6">
           <div className="mb-6 md:mb-0">
-            <Link href="/" className="flex items-center">
+            <Link href="https://prospectsports.xyz" className="flex items-center">
               <Image 
                 src="https://cdn.prod.website-files.com/62ffc292db8ee4c6c0ebfdfc/62ffc292db8ee4805aebfe85_prospect-gaming-logo-full.svg"
                 alt="Prospect"

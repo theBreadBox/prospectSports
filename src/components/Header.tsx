@@ -40,7 +40,7 @@ const Header = () => {
     >
       <div className="container-default max-w-[1250px] mx-auto px-[24px] flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center">
+        <Link href="https://prospectsports.xyz" className="flex items-center">
           <Image 
             src="https://cdn.prod.website-files.com/62ffc292db8ee4c6c0ebfdfc/62ffc292db8ee4805aebfe85_prospect-gaming-logo-full.svg"
             alt="Prospect"
@@ -60,7 +60,7 @@ const Header = () => {
             {/* About Dropdown */}
             <div className="relative group nav-item-wrapper">
               <button
-                className="flex items-center text-white hover:text-[#4AAEB5] transition-colors py-2 font-medium tracking-wide uppercase text-[14px]"
+                className="flex items-center text-white hover:text-[#4AAEB5] transition-colors py-2 font-medium tracking-wide uppercase text-[16px]"
                 aria-label="About menu"
               >
                 <span>ABOUT</span>
