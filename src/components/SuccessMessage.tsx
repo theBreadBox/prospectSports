@@ -30,7 +30,7 @@ export const SuccessMessage: React.FC<SuccessMessageProps> = ({ onNextClick }) =
         </div>
       </div>
       
-      <h2 className="text-[#59ff83] text-[45px] md:text-[66px] font-bold mb-2">You're Signed up! We&nbsp;Ball!</h2>
+      <h2 className="text-[#59ff83] text-[45px] md:text-[66px] font-bold mb-2">You&apos;re Signed up! We&nbsp;Ball!</h2>
       
       <div className="flex flex-col gap-2 text-center mx-auto max-w-[480px]">
         <p className="text-neutral-light-10">Look for an email to complete enrollment in our $CHAMPSTER loyalty program</p>

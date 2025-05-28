@@ -1,6 +1,7 @@
 import React, { Suspense, useRef, useState, useEffect } from "react";
 import Spline from '@splinetool/react-spline';
 import { ReferredUser } from './ReferralCube';
+import type { Application } from '@splinetool/runtime';
 
 interface ReferralStats {
   totalReferrals: number;
@@ -16,7 +17,7 @@ export const SplineViewer: React.FC<SplineViewerProps> = ({
   referralCode,
   onAnimationComplete
 }) => {
-  const splineRef = useRef<any>(null);
+  const splineRef = useRef<Application | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [referralStats, setReferralStats] = useState<ReferralStats | null>(null);
@@ -39,11 +40,15 @@ export const SplineViewer: React.FC<SplineViewerProps> = ({
     return sceneUrls[referralCode] || sceneUrls.default;
   };
 
-  const handleLoad = (spline: any) => {
+  const handleLoad = (spline: Application) => {
     try {
       splineRef.current = spline;
-      if (spline?.runtime?.orbitControls) {
-        spline.runtime.orbitControls.enableZoom = false;
+      // Type assertion for accessing runtime properties that may not be in the type definition
+      const splineWithRuntime = spline as Application & { 
+        runtime?: { orbitControls?: { enableZoom: boolean } } 
+      };
+      if (splineWithRuntime?.runtime?.orbitControls) {
+        splineWithRuntime.runtime.orbitControls.enableZoom = false;
       }
       setIsLoading(false);
       onAnimationComplete?.();
