@@ -1,7 +1,8 @@
 import React, { Suspense, useRef, useState, useEffect } from "react";
-import Spline from '@splinetool/react-spline';
+import Spline from '@splinetool/react-spline/next';
 import { ReferredUser } from './ReferralCube';
 import type { Application } from '@splinetool/runtime';
+import Image from 'next/image';
 
 interface ReferralStats {
   totalReferrals: number;
@@ -10,11 +11,13 @@ interface ReferralStats {
 
 interface SplineViewerProps {
   referralCode: string;
+  referralCount: number;
   onAnimationComplete?: () => void;
 }
 
 export const SplineViewer: React.FC<SplineViewerProps> = ({
   referralCode,
+  referralCount,
   onAnimationComplete
 }) => {
   const splineRef = useRef<Application | null>(null);
@@ -25,19 +28,17 @@ export const SplineViewer: React.FC<SplineViewerProps> = ({
   const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
   const [showCubeNeonEffect, setShowCubeNeonEffect] = useState(false);
 
-  const getSplineSceneUrl = () => {
-    // Map referral counts to specific Spline scenes
-    const sceneUrls: { [key: string]: string } = {
-      '1': 'https://prod.spline.design/WbZpxjhySysoPEbZ/scene.splinecode',
-      '2': 'https://prod.spline.design/GJy3SkmvCGPuUDZ5/scene.splinecode',
-      '3': 'https://prod.spline.design/qbm36HS4X5dCB4Fh/scene.splinecode',
-      '4': 'https://prod.spline.design/sNT40GKtl2J-PwV5/scene.splinecode',
-      '5': 'https://prod.spline.design/7Y5294MroVbAcrDZ/scene.splinecode',
-      '6': 'https://prod.spline.design/MV5xDpbJlrjUbC1i/scene.splinecode',
-      'default': 'https://prod.spline.design/awNJZxGj0cPIvpc7/scene.splinecode'
+  const getSplineSceneUrl = (count: number): string => {
+    const scenes = {
+      0: 'https://prod.spline.design/awNJZxGj0cPIvpc7/scene.splinecode',
+      1: 'https://prod.spline.design/Ok70xytR1bXS0AhG/scene.splinecode',
+      2: 'https://prod.spline.design/GJy3SkmvCGPuUDZ5/scene.splinecode',
+      3: 'https://prod.spline.design/qbm36HS4X5dCB4Fh/scene.splinecode',
+      4: 'https://prod.spline.design/sNT40GKtl2J-PwV5/scene.splinecode',
+      5: 'https://prod.spline.design/7Y5294MroVbAcrDZ/scene.splinecode',
+      6: 'https://prod.spline.design/MV5xDpbJlrjUbC1i/scene.splinecode'
     };
-
-    return sceneUrls[referralCode] || sceneUrls.default;
+    return scenes[count as keyof typeof scenes] || scenes[0];
   };
 
   const handleLoad = (spline: Application) => {
@@ -69,7 +70,7 @@ export const SplineViewer: React.FC<SplineViewerProps> = ({
       <Suspense fallback={null}>
         {!hasError ? (
           <Spline
-            scene={getSplineSceneUrl()}
+            scene={getSplineSceneUrl(referralCount)}
             onLoad={handleLoad}
             onError={() => setHasError(true)}
           />

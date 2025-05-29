@@ -202,14 +202,14 @@ const ReferralCubeComponent: React.FC<ReferralCubeProps> = ({ userReferralCode, 
         let faceTextContent = null;
         if ((detail.isUserFace || detail.isReferralCompleteFace) && detail.displayedText && detail.texturePath) {
             const basePosition: [number, number, number] = [...config.position as [number,number,number]];
-            const textOffsetDistance = 0.02 + offset; // ensure text is in front of decal
+            const textOffsetDistance = 0.02 + offset;
 
             const textPosition: [number, number, number] = [...basePosition];
             if(textPosition[0] !== 0) textPosition[0] *= (1 + textOffsetDistance / Math.abs(textPosition[0]));
             if(textPosition[1] !== 0) textPosition[1] *= (1 + textOffsetDistance / Math.abs(textPosition[1]));
             if(textPosition[2] !== 0) textPosition[2] *= (1 + textOffsetDistance / Math.abs(textPosition[2]));
 
-            const yShift = -0.9; // Position text below the image
+            const yShift = -0.9;
             const finalTextPosition = new THREE.Vector3(...textPosition);
             const localYDown = new THREE.Vector3(0, yShift, 0);
             const faceQuaternion = new THREE.Quaternion().setFromEuler(new THREE.Euler(...config.rotation as [number,number,number]));

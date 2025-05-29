@@ -5,6 +5,8 @@ import "./globals.css";
 import "@rainbow-me/rainbowkit/styles.css";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import WalletDisplay from "../components/WalletDisplay";
+import WalletStatusCheck from "../components/WalletStatusCheck";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -27,6 +29,8 @@ export default function RootLayout({
       <body className="bg-[#001118] min-h-screen">
         <WalletProvider>
           <Header />
+          <WalletDisplay />
+          <WalletStatusCheck />
           <main className="pt-[120px] md:pt-[140px]">
             {children}
           </main>

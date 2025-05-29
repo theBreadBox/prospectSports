@@ -73,8 +73,7 @@ export async function GET(request: Request) {
       const referralsResult = await client.query(
         `SELECT 
           r.email AS referred_email,
-          r.wallet_address AS referred_wallet,
-          
+          r.wallet_address AS referred_wallet
         FROM prospect_al p
         JOIN prospect_al r ON r.referred_by = p.referral_code
         WHERE p.id = $1`,

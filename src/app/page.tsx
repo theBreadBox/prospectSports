@@ -441,6 +441,57 @@ export default function Home() {
     }
   };
 
+  useEffect(() => {
+    const handleResetForm = () => {
+      setActiveStep(1);
+      setCompletedSteps([]);
+      setEmail('');
+      setReferralCode('');
+      setEmailError('');
+      setIsFormValid(false);
+      setIsFormComplete(false);
+      setShowReferralSteps(false);
+      setShowSuccessMessage(false);
+    };
+
+    window.addEventListener('resetForm', handleResetForm);
+    
+    return () => {
+      window.removeEventListener('resetForm', handleResetForm);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleUserRegistered = (event: CustomEvent) => {
+      setIsRegistered(true);
+      setIsFormComplete(true);
+      setShowReferralSteps(true);
+      setActiveStep(5);
+      
+      // Fetch referral data
+      const fetchReferralData = async () => {
+        if(event.detail.address) {
+          try {
+            const response = await fetch(`/api/referrals?wallet=${event.detail.address}`);
+            if (response.ok) {
+              const data = await response.json();
+              setReferralStats(data.stats);
+              setReferredUsersList(data.referred_users || []);
+            }
+          } catch (error) {
+            console.error("Error fetching referral data:", error);
+          }
+        }
+      };
+      fetchReferralData();
+    };
+
+    window.addEventListener('userRegistered', handleUserRegistered as EventListener);
+    return () => {
+      window.removeEventListener('userRegistered', handleUserRegistered as EventListener);
+    };
+  }, []);
+
   return (
     <div className="bg-[#001118] flex flex-col justify-center items-center w-full py-4">
       {/* Sticky Progress Bar */}
@@ -510,8 +561,8 @@ export default function Home() {
         <div className="flex flex-col w-full items-center relative">
           {!isFormComplete ? (
             !showSuccessMessage ? (
-              <div className="flex flex-col md:flex-row items-start justify-between gap-4 w-full max-w-[1080px] mb-4 pt-12">
-                <div className="flex flex-col w-full md:w-1/2 items-start gap-3">
+              <div className="flex flex-col md:flex-row items-start justify-between gap-8 scroll-mt-0">
+                <div className="w-full md:w-1/2 flex flex-col gap-4 mt-0">
                   <motion.h1 
                     className="font-bold text-[#ffffff] text-[45px] md:text-[66px] leading-tight md:leading-[1.212em] tracking-[-.01em] mt-0"
                     initial={{ opacity: 0, y: 20 }}
@@ -549,6 +600,15 @@ export default function Home() {
                           </div>
                         </div>
                         <div className="flex flex-col items-center mt-4">
+                          <div className="flex items-center justify-center gap-2 mb-4">
+                            <span className="text-[#4AE5FB] text-sm">An EVM Compatible Wallet is Required</span>
+                            <div className="group relative">
+                              <span className="cursor-help text-[#4AE5FB]">ⓘ</span>
+                              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-[#0d192a] text-sm text-white rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap border border-[#00354d]">
+                                Ethereum Virtual Machine (EVM)
+                              </div>
+                            </div>
+                          </div>
                           <ConnectButton.Custom>
                             {({
                               account,
@@ -799,6 +859,7 @@ export default function Home() {
                       <div className="w-full h-full relative overflow-visible z-10">
                         <SplineViewer
                           referralCode={userReferralCode}
+                          referralCount={referredUsersList?.length || 0}
                           onAnimationComplete={() => setShowCubeNeonEffect(true)}
                         />
                       </div>
@@ -838,7 +899,7 @@ export default function Home() {
               </div>
             ) : (
               // Success Message Component
-              <div className="w-full max-w-[800px] text-center mx-auto mb-6 py-12">
+              <div className="w-full max-w-[800px] text-center mx-auto mb-6 py-12 mt-0">
                 <motion.div
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -855,7 +916,7 @@ export default function Home() {
                     </p>
                     <button
                       onClick={handleNextToReferrals}
-                      className="bg-[#4AE5FB] text-[#092a36] px-8 py-3 rounded-full font-semibold text-lg hover:bg-[#3ccde0] transition-all duration-300" // Slightly darker hover
+                      className="bg-[#4AE5FB] text-[#092a36] px-8 py-3 rounded-full font-semibold text-lg hover:bg-[#3ccde0] transition-all duration-300"
                     >
                       Start Referring Friends
                     </button>
@@ -887,8 +948,8 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="w-full flex flex-col md:flex-row items-start justify-between gap-8">
-                <div className="w-full md:w-1/2 flex flex-col gap-4">
+              <div className="w-full flex flex-col md:flex-row items-start justify-between gap-8 scroll-mt-0">
+                <div className="w-full md:w-1/2 flex flex-col gap-4 mt-0">
                   <div 
                     className="bg-[#0d192a] p-5 rounded-lg border border-[#00354d] hover:bg-[#0f1f32] transition-all duration-300 cursor-pointer"
                     onClick={handleCopyCode}
@@ -1011,12 +1072,13 @@ export default function Home() {
                 <div className="w-full md:w-1/2 flex flex-col items-center">
                   <div className="w-full h-[400px] relative touch-pan-y overflow-auto" ref={cubeContainerRef}>
                     {isRegistered && userReferralCode && referralStats ? (
-                      <ReferralCube 
-                        userReferralCode={userReferralCode} 
-                        referralStats={referralStats} 
-                        referredUsers={referredUsersList}
-                        neonEffectActive={showCubeNeonEffect}
-                      />
+                      <div className="w-full h-full relative overflow-visible z-10">
+                        <SplineViewer
+                          referralCode={userReferralCode}
+                          referralCount={referredUsersList?.length || 0}
+                          onAnimationComplete={() => setShowCubeNeonEffect(true)}
+                        />
+                      </div>
                     ) : (
                       <div className="flex flex-col items-center justify-center w-full h-full">
                         <Image 
