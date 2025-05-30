@@ -16,7 +16,8 @@ export const SuccessMessage: React.FC<SuccessMessageProps> = ({ onNextClick }) =
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      {/* Updated Champster image - smaller with less padding */}
+      
+      {/* Updated Champster image - smaller with less padding commenting for push */}
       <div className="mb-2 flex justify-center">
         <div className="flex items-center justify-center">
           <img 
