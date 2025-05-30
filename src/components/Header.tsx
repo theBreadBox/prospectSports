@@ -80,6 +80,7 @@ const Header = () => {
                 </div>
               </div>
             </div>
+            <NavLink href="/community" label="COMMUNITY" />
           </nav>
           
           <div className="flex items-center space-x-6">
@@ -146,6 +147,16 @@ const Header = () => {
                 className="text-[32px] py-4"
               />
               
+              {/* About Button in Mobile Menu */}
+              <button
+                onClick={() => handleDropdownToggle('mobile-about')}
+                className="flex items-center text-white hover:text-[#4AAEB5] transition-colors py-4 font-medium tracking-wide uppercase text-[32px]"
+                aria-label="About menu"
+              >
+                <span>ABOUT</span>
+                <ChevronDown className="ml-2 h-8 w-8" />
+              </button>
+              
               {/* Mobile About Dropdown Links */}
               {activeDropdown === 'mobile-about' && (
                 <div className="ml-4 mt-2 space-y-3 flex flex-col">
@@ -153,28 +164,35 @@ const Header = () => {
                     href="https://www.prospectsports.xyz/about" 
                     label="ABOUT" 
                     onClick={() => setIsOpen(false)} 
-                    className="text-[24px] py-2"
+                    className="text-[32px] py-2"
                   />
                   <NavLink 
                     href="https://www.prospectsports.io/about#Team" 
                     label="OUR TEAM" 
                     onClick={() => setIsOpen(false)} 
-                    className="text-[24px] py-2"
+                    className="text-[32px] py-2"
                   />
                   <NavLink 
                     href="https://www.prospectsports.io/about#Roadmap" 
                     label="ROADMAP" 
                     onClick={() => setIsOpen(false)} 
-                    className="text-[24px] py-2"
+                    className="text-[32px] py-2"
                   />
                   <NavLink 
                     href="https://www.prospectsports.io/about#Media" 
                     label="MEDIA" 
                     onClick={() => setIsOpen(false)} 
-                    className="text-[24px] py-2"
+                    className="text-[32px] py-2"
                   />
                 </div>
               )}
+
+              <NavLink 
+                href="/community" 
+                label="COMMUNITY" 
+                onClick={() => setIsOpen(false)} 
+                className="text-[32px] py-4"
+              />
             </nav>
             
             {!activeDropdown && (

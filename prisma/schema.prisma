@@ -1,0 +1,17 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String   @id @default(cuid())
+  email            String   @unique
+  wallet_address   String   @unique
+  twitter_username String?
+  twitter_id       String?  @unique
+  access_token     String?
+  referral_code    String   @unique
+  referred_by      String?
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+} 

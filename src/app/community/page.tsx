@@ -12,12 +12,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { Wallet, LogOut, Copy, Check, CheckCircle2 } from "lucide-react";
 import { SplineViewer } from '@/components/SplineViewer';
-import { HeroSection } from '../components/HeroSection';
 import dynamic from 'next/dynamic';
+import TwitterSignInButton from '@/components/TwitterButton';
+import { CollabLogo } from '@/components/CollabLogo';
 
 // import Feedback from "./Feedback"; // Assuming this is not used or defined elsewhere
 // import Navbar from '../components/Navbar'; // Assuming this is not used or defined elsewhere
-import TwitterSignInButton from '../components/TwitterButton'; // Make sure this component exists
 
 // Dynamic import for ReferralCube to avoid SSR issues with Three.js
 const ReferralCube = dynamic(() => import('@/components/ReferralCube'), {
@@ -227,13 +227,20 @@ export default function Home() {
       setEmailError("Please enter a valid email address");
       setIsFormValid(false);
     } else if (isValidEmail(email)) {
-      setEmailError("");
+      setEmailError(""); // Clear error if valid
       if (!completedSteps.includes(2)) {
         setCompletedSteps(prev => [...prev, 2]);
       }
-      setActiveStep(3); // Move to Twitter step
-      setIsFormValid(true);
+      // setActiveStep(3); // Move to Twitter step
+      // For now, as per original logic, let's assume Twitter is optional and we can proceed
+      // If Twitter is a distinct step, uncomment setActiveStep(3) and adjust Twitter skip logic
+       if (!completedSteps.includes(3)) { // Mark Twitter as "handled/skipped"
+           setCompletedSteps(prev => [...prev, 3]);
+       }
+       setActiveStep(4); // Move to referral code step
+       setIsFormValid(true); // Email is valid, form is valid for this step
     } else {
+      // Email field is empty, not necessarily an error for blur, but form not valid
       setIsFormValid(false);
     }
   };
@@ -1124,7 +1131,7 @@ export default function Home() {
 
       {/* Hero Banner moved to bottom of the page */}
       <div className="w-full mt-6 mb-6 max-w-[1080px] mx-auto" ref={heroRef}>
-        <HeroSection />
+        <CollabLogo />
       </div>
     </div>
   );

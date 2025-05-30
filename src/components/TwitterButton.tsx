@@ -1,39 +1,52 @@
 "use client";
 
 import { useState } from 'react';
+import { generateRandomString } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
 
 interface TwitterSignInButtonProps {
   buttonText?: string;
   className?: string;
   icon?: React.ReactNode; // Optional prop for an icon
+  onSuccess: () => void;
 }
 
 export default function TwitterSignInButton({ 
   buttonText = "Sign in with Twitter", 
   className = "w-full py-3 rounded-lg bg-[#1DA1F2] text-white font-bold hover:opacity-90 transition-opacity flex items-center justify-center",
-  icon
+  icon,
+  onSuccess
 }: TwitterSignInButtonProps) {
   const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
   const handleTwitterSignIn = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/x/request-token', { method: 'POST' });
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({})); // Gracefully handle if json parsing fails
-        console.error('Failed to initiate Twitter sign-in:', errorData.error || response.statusText);
-        // Optionally, you could pass a setMessage prop to display errors to the user
-        setLoading(false);
-        return;
-      }
-      const { oauth_token } = await response.json();
-      // Redirect to Twitter authorization URL
-      window.location.href = `https://api.twitter.com/oauth/authorize?oauth_token=${oauth_token}`;
-      // setLoading(false) might not be reached if redirection is immediate
+      // Generate and store state parameter
+      const state = generateRandomString(32);
+      sessionStorage.setItem('twitter_oauth_state', state);
+      
+      // Construct Twitter OAuth URL
+      const params = new URLSearchParams({
+        response_type: 'code',
+        client_id: process.env.NEXT_PUBLIC_TWITTER_CLIENT_ID!,
+        redirect_uri: process.env.NODE_ENV === 'development' 
+          ? 'http://localhost:3000/community'
+          : 'https://www.prospectsports.xyz/community',
+        scope: 'users.read',
+        state: state
+      });
+
+      window.location.href = `https://twitter.com/i/oauth2/authorize?${params.toString()}`;
     } catch (error) {
-      console.error('Error during Twitter sign-in:', error);
+      console.error('Error initiating Twitter sign-in:', error);
       setLoading(false);
-      // Optionally, display an error message to the user
+      toast({
+        title: 'Error',
+        description: 'Failed to initiate Twitter sign-in. Please try again.',
+        variant: 'destructive',
+      });
     }
   };
 
