@@ -12,6 +12,25 @@ function generateReferralCode() {
   return crypto.randomBytes(5).toString('hex');
 }
 
+// Function to check if data contains test patterns
+function isTestData(wallet_address: string, email: string): boolean {
+  const testPatterns = [
+    /0xapi_test/i,
+    /api_test/i,
+    /test_/i,
+    /\.test$/i,
+    /@test\./i,
+    /test@/i,
+    /staging/i,
+    /dev\./i,
+    /@dev\./i
+  ];
+  
+  return testPatterns.some(pattern => 
+    pattern.test(wallet_address) || pattern.test(email)
+  );
+}
+
 export async function POST(request: Request) {
   try {
     const { wallet_address, email, referred_by} = await request.json();
@@ -22,6 +41,15 @@ export async function POST(request: Request) {
 
     if (!email) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 });
+    }
+
+    // Block test data from being inserted
+    if (isTestData(wallet_address, email)) {
+      console.log(`Blocked test data insertion: wallet=${wallet_address}, email=${email}`);
+      return NextResponse.json(
+        { error: 'Invalid data format detected' },
+        { status: 400 }
+      );
     }
 
     // Get a client from the pool
