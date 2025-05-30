@@ -6,8 +6,22 @@ import { ReferralsList } from './referral/ReferralsList';
 import { MemeFaces } from './meme/MemeFaces';
 import { MemeModal } from './meme/MemeModal';
 
+// Simple User type to avoid Prisma import issues
+interface User {
+  id: string;
+  email: string;
+  wallet_address: string;
+  twitter_username?: string | null;
+  twitter_id?: string | null;
+  access_token?: string | null;
+  referral_code: string;
+  referred_by?: string | null;
+  created_at: Date;
+  updated_at: Date;
+}
+
 interface ReferralStats {
-  referred_users: Array<any>; // Replace 'any' with your actual referral user type
+  referred_users: Array<User>;
 }
 
 export default function ReferralTracker() {
@@ -42,7 +56,10 @@ export default function ReferralTracker() {
       </div>
       
       <ReferralsList 
-        referrals={referralStats?.referred_users || []}
+        referrals={referralStats?.referred_users.map(user => ({
+          address: user.wallet_address,
+          timestamp: user.created_at.getTime()
+        })) || []}
         getOrdinalSuffix={(num: number) => {
           const j = num % 10;
           const k = num % 100;

@@ -39,8 +39,13 @@ export async function GET(request: Request) {
     const { data: userData } = await userResponse.json();
 
     // Update user record with Twitter info
+    const currentEmail = sessionStorage.getItem('current_email');
+    if (!currentEmail) {
+      return NextResponse.json({ error: 'No email found in session' }, { status: 400 });
+    }
+
     await prisma.user.update({
-      where: { email: sessionStorage.getItem('current_email') },
+      where: { email: currentEmail },
       data: {
         twitter_username: userData.username,
         twitter_id: userData.id,
