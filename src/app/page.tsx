@@ -48,6 +48,7 @@ export default function Home() {
   const [isRegistered, setIsRegistered] = useState(false);
   const [email, setEmail] = useState('');
   const [referralCode, setReferralCode] = useState('');
+  const [urlReferralCode, setUrlReferralCode] = useState(''); // Store URL referral code separately
   const [userReferralCode, setUserReferralCode] = useState('');
   const [referralStats, setReferralStats] = useState<ReferralStats | null>(null);
   const [referredUsersList, setReferredUsersList] = useState<ReferredUser[]>([]);
@@ -85,7 +86,8 @@ export default function Home() {
       const urlParams = new URLSearchParams(window.location.search);
       const refCode = urlParams.get('ref');
       if (refCode) {
-        setReferralCode(refCode);
+        setUrlReferralCode(refCode); // Store the URL referral code
+        setReferralCode(refCode); // Set it as the current referral code
       }
     }
   }, []);
@@ -123,7 +125,7 @@ export default function Home() {
         setActiveStep(1);
         setCompletedSteps([]);
         setEmail('');
-        setReferralCode('');
+        setReferralCode(urlReferralCode); // Preserve URL referral code instead of clearing
         setEmailError('');
         setIsFormValid(false);
         setIsFormComplete(false);
@@ -137,6 +139,7 @@ export default function Home() {
   useEffect(() => {
     const checkRegistration = async () => {
       if (address && status === 'connected') {
+        setLoading(true); // Show loading while checking registration
         try {
           const response = await fetch(`/api/referrals?wallet=${address}`);
           if (response.ok) {
@@ -152,9 +155,28 @@ export default function Home() {
             setShowReferralSteps(true);
             setCompletedSteps([1, 2, 3, 4]); // Mark all initial steps as complete
             setActiveStep(5); // Move to a "post-registration" step, e.g., referral display
+            setMessage(''); // Clear any previous messages
+            
+            // Automatically scroll to referral section after a brief delay
+            setTimeout(() => {
+              const referralSection = document.getElementById('referral-section');
+              if (referralSection) {
+                referralSection.scrollIntoView({ behavior: 'smooth' });
+              }
+            }, 300);
+            
           } else {
             // User not registered, reset relevant states if they were previously set
             setIsRegistered(false);
+            setIsFormComplete(false);
+            setShowReferralSteps(false);
+            setUserReferralCode('');
+            setReferralStats(null);
+            setReferredUsersList([]);
+            // Preserve URL referral code when resetting
+            if (urlReferralCode && !referralCode) {
+              setReferralCode(urlReferralCode);
+            }
             // If wallet is connected but user not registered, ensure form starts at email step
             if (activeStep < 2) {
                 setActiveStep(2);
@@ -162,11 +184,32 @@ export default function Home() {
           }
         } catch (error) {
           console.error('Error checking registration:', error);
+          setIsRegistered(false);
+          setIsFormComplete(false);
+          setShowReferralSteps(false);
           // Potentially set activeStep to 2 if registration check fails but wallet is connected
            if (activeStep < 2 && status === 'connected') {
-                setActiveStep(2);
+              setActiveStep(2);
            }
+        } finally {
+          setLoading(false); // Clear loading state
         }
+      } else if (status === 'disconnected') {
+        // Reset all states when wallet is disconnected
+        setIsRegistered(false);
+        setIsFormComplete(false);
+        setShowReferralSteps(false);
+        setUserReferralCode('');
+        setReferralStats(null);
+        setReferredUsersList([]);
+        setActiveStep(1);
+        setCompletedSteps([]);
+        setEmail('');
+        setReferralCode(urlReferralCode); // Preserve URL referral code
+        setEmailError('');
+        setIsFormValid(false);
+        setShowSuccessMessage(false);
+        setMessage('');
       }
     };
 
@@ -439,7 +482,7 @@ export default function Home() {
       setActiveStep(1);
       setCompletedSteps([]);
       setEmail('');
-      setReferralCode('');
+      setReferralCode(urlReferralCode); // Preserve URL referral code instead of clearing
       setEmailError('');
       setIsFormValid(false);
       setIsFormComplete(false);
@@ -779,6 +822,12 @@ export default function Home() {
                             </div>
                         )}
 
+                        {/* Loading state when checking registration */}
+                        {loading && status === 'connected' && !isRegistered && activeStep === 2 && !email && (
+                          <div className="text-[#4AE5FB] text-sm">
+                            Checking registration status...
+                          </div>
+                        )}
 
                         {/* Wallet connection and submit button */}
                         {status === "connected" && !isRegistered && (activeStep === 2 || activeStep === 3 || activeStep === 4) && (
@@ -1007,9 +1056,9 @@ export default function Home() {
                     
                     <div className="flex items-center justify-between">
                       <div className="flex flex-col gap-1">
-                        <span className="text-neutral-light-10 text-sm">Your referral link:</span>
+                        <span className="text-neutral-light-10 text-sm">Your referral code:</span>
                         <span className="text-[#4AE5FB] text-lg md:text-xl font-bold break-all">
-                          {userReferralCode ? `${window.location.origin}?ref=${userReferralCode}` : "loading..."}
+                          {userReferralCode || "loading..."}
                         </span>
                       </div>
                       <div className="text-[#4AE5FB]">
