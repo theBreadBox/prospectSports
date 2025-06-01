@@ -70,6 +70,9 @@ export default function Home() {
   const [lastUnlockedFace, setLastUnlockedFace] = useState<number>(0);
   const [selectedReferralCount, setSelectedReferralCount] = useState<number | null>(null);
 
+  // New state for Twitter data
+  const [twitterData, setTwitterData] = useState<{username: string, id: string} | null>(null);
+
   // References for animations
   const cubeContainerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -85,12 +88,64 @@ export default function Home() {
     if (typeof window !== 'undefined') {
       const urlParams = new URLSearchParams(window.location.search);
       const refCode = urlParams.get('ref');
+      const fromCommunity = urlParams.get('from');
+      
       if (refCode) {
         setUrlReferralCode(refCode); // Store the URL referral code
         setReferralCode(refCode); // Set it as the current referral code
       }
+      
+      if (fromCommunity === 'community') {
+        setMessage('Please complete registration to access the community page.');
+        // Clean up the parameter
+        const newUrl = new URL(window.location.href);
+        newUrl.searchParams.delete('from');
+        window.history.replaceState({}, '', newUrl.toString());
+      }
     }
   }, []);
+
+  // Handle Twitter OAuth callback
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const twitterSuccess = urlParams.get('twitter_success');
+      const twitterUsername = urlParams.get('twitter_username');
+      const twitterId = urlParams.get('twitter_id');
+      const error = urlParams.get('error');
+
+      if (error) {
+        setMessage(`Twitter authentication failed: ${error}`);
+        return;
+      }
+
+      if (twitterSuccess === 'true' && twitterUsername && twitterId) {
+        // Store Twitter data temporarily
+        setTwitterData({ username: twitterUsername, id: twitterId });
+        
+        // Mark Twitter step as completed
+        if (!completedSteps.includes(3)) {
+          setCompletedSteps(prev => [...prev, 3]);
+        }
+        
+        // Move to referral step if we're currently on Twitter step
+        if (activeStep === 3) {
+          setActiveStep(4);
+        }
+        
+        // Clean up URL parameters
+        const newUrl = new URL(window.location.href);
+        newUrl.searchParams.delete('twitter_success');
+        newUrl.searchParams.delete('twitter_username');
+        newUrl.searchParams.delete('twitter_id');
+        newUrl.searchParams.delete('error');
+        window.history.replaceState({}, '', newUrl.toString());
+        
+        setMessage('Twitter account connected successfully!');
+        setTimeout(() => setMessage(''), 3000);
+      }
+    }
+  }, [activeStep, completedSteps]);
 
   // Get window size for confetti
   useEffect(() => {
@@ -334,7 +389,9 @@ export default function Home() {
             body: JSON.stringify({ 
               wallet_address: address, 
               email, // Email should be valid by this point if activeStep was 2
-              referred_by: isSkippingReferral ? undefined : referralCode || undefined
+              referred_by: isSkippingReferral ? undefined : referralCode || undefined,
+              twitter_id: twitterData?.id,
+              twitter_username: twitterData?.username
             }),
           });
     
@@ -768,12 +825,18 @@ export default function Home() {
                         {/* Twitter Sign In - Step 3 */}
                         {status === "connected" && !isRegistered && activeStep === 3 && (
                           <div className="w-full">
-                            <TwitterSignInButton onSuccess={() => {
-                              if (!completedSteps.includes(3)) {
-                                setCompletedSteps(prev => [...prev, 3]);
-                              }
-                              setActiveStep(4);
-                            }} />
+                            {twitterData ? (
+                              <div className="w-full p-3 bg-green-500/20 border border-green-500/50 rounded-lg text-green-400 text-center">
+                                ✓ Connected as @{twitterData.username}
+                              </div>
+                            ) : (
+                              <TwitterSignInButton onSuccess={() => {
+                                if (!completedSteps.includes(3)) {
+                                  setCompletedSteps(prev => [...prev, 3]);
+                                }
+                                setActiveStep(4);
+                              }} />
+                            )}
                             <button 
                               type="button"
                               className="w-full mt-2 bg-transparent border border-[#00354d] hover:bg-[#001118]/50 text-[#4AE5FB] h-10 rounded-lg text-sm"
@@ -785,7 +848,7 @@ export default function Home() {
                                 // setIsFormValid(isValidEmail(email)); // Re-check form validity if needed, email should be valid by now
                               }}
                             >
-                              Don&apos;t have Twitter? Skip
+                              {twitterData ? 'Continue' : "Don't have Twitter? Skip"}
                             </button>
                           </div>
                         )}

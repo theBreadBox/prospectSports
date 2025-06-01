@@ -17,13 +17,15 @@ function isTestData(wallet_address: string, email: string): boolean {
   const testPatterns = [
     /0xapi_test/i,
     /api_test/i,
-    /test_/i,
+    /test_wallet/i,  // More specific test pattern
     /\.test$/i,
-    /@test\./i,
+    /@testing\./i,   // Changed from /@test\./ to /@testing\./
     /test@/i,
     /staging/i,
     /dev\./i,
-    /@dev\./i
+    /@dev\./i,
+    /@example\./i,   // Block example domains
+    /@fake\./i       // Block fake domains
   ];
   
   return testPatterns.some(pattern => 
@@ -33,18 +35,38 @@ function isTestData(wallet_address: string, email: string): boolean {
 
 export async function POST(request: Request) {
   try {
-    const { wallet_address, email, referred_by} = await request.json();
+    const requestBody = await request.json();
+    const { wallet_address, referred_by, twitter_id, twitter_username } = requestBody;
+    let { email } = requestBody;
+
+    console.log('=== Submit Wallet Debug ===');
+    console.log('Request body:', requestBody);
+    console.log('Wallet address:', wallet_address);
+    console.log('Email:', email);
+    console.log('Referred by:', referred_by);
+    console.log('Twitter ID:', twitter_id);
+    console.log('Twitter username:', twitter_username);
+    console.log('=== End Debug ===');
 
     if (!wallet_address) {
+      console.log('Missing wallet address');
       return NextResponse.json({ error: 'Wallet address is required' }, { status: 400 });
     }
 
     if (!email) {
-      return NextResponse.json({ error: 'Email is required' }, { status: 400 });
+      // If Twitter data is provided, we can make email optional
+      if (twitter_id && twitter_username) {
+        console.log('Email not provided, but Twitter data is available - proceeding without email');
+        // We'll use a placeholder email based on Twitter username with a safe domain
+        email = `${twitter_username}@twitter-user.com`;
+      } else {
+        console.log('Missing email and no Twitter data');
+        return NextResponse.json({ error: 'Email is required when Twitter is not connected' }, { status: 400 });
+      }
     }
 
-    // Block test data from being inserted
-    if (isTestData(wallet_address, email)) {
+    // Block test data from being inserted (but allow Twitter placeholder emails)
+    if (isTestData(wallet_address, email) && !email.includes('@twitter-user.com')) {
       console.log(`Blocked test data insertion: wallet=${wallet_address}, email=${email}`);
       return NextResponse.json(
         { error: 'Invalid data format detected' },
@@ -113,19 +135,58 @@ export async function POST(request: Request) {
       // Generate a unique referral code for this user
       const referral_code = generateReferralCode();
 
-      // Insert the new address with email and referral information
-      if (referred_by) {
-        await client.query(
-          'INSERT INTO prospect_al (wallet_address, email, referral_code, referred_by) VALUES ($1, $2, $3, $4)',
-          [wallet_address, email, referral_code, referred_by]
-        );
-      } else {
-        await client.query(
-          'INSERT INTO prospect_al (wallet_address, email, referral_code) VALUES ($1, $2, $3)',
-          [wallet_address, email, referral_code]
-        );
+      // Prepare the insert query based on what data we have
+      let insertQuery: string;
+      let insertValues: (string | undefined)[];
+
+      try {
+        // Try to insert with Twitter data if available (store username in twitter_id column)
+        if (twitter_id && twitter_username) {
+          console.log('Attempting insert with Twitter username in twitter_id column');
+          if (referred_by) {
+            insertQuery = 'INSERT INTO prospect_al (wallet_address, email, referral_code, referred_by, twitter_id) VALUES ($1, $2, $3, $4, $5)';
+            insertValues = [wallet_address, email, referral_code, referred_by, twitter_username]; // Store username in twitter_id column
+          } else {
+            insertQuery = 'INSERT INTO prospect_al (wallet_address, email, referral_code, twitter_id) VALUES ($1, $2, $3, $4)';
+            insertValues = [wallet_address, email, referral_code, twitter_username]; // Store username in twitter_id column
+          }
+        } else {
+          console.log('Attempting insert without Twitter data');
+          if (referred_by) {
+            insertQuery = 'INSERT INTO prospect_al (wallet_address, email, referral_code, referred_by) VALUES ($1, $2, $3, $4)';
+            insertValues = [wallet_address, email, referral_code, referred_by];
+          } else {
+            insertQuery = 'INSERT INTO prospect_al (wallet_address, email, referral_code) VALUES ($1, $2, $3)';
+            insertValues = [wallet_address, email, referral_code];
+          }
+        }
+
+        // Execute the insert
+        console.log('Executing insert query:', insertQuery);
+        console.log('With values:', insertValues);
+        await client.query(insertQuery, insertValues);
+
+      } catch (twitterInsertError) {
+        // If Twitter insert fails, try without Twitter data
+        if (twitter_id && twitter_username && twitterInsertError instanceof Error) {
+          console.log('Twitter insert failed, retrying without Twitter data:', twitterInsertError.message);
+          if (referred_by) {
+            insertQuery = 'INSERT INTO prospect_al (wallet_address, email, referral_code, referred_by) VALUES ($1, $2, $3, $4)';
+            insertValues = [wallet_address, email, referral_code, referred_by];
+          } else {
+            insertQuery = 'INSERT INTO prospect_al (wallet_address, email, referral_code) VALUES ($1, $2, $3)';
+            insertValues = [wallet_address, email, referral_code];
+          }
+          
+          console.log('Retrying insert query:', insertQuery);
+          console.log('With values:', insertValues);
+          await client.query(insertQuery, insertValues);
+        } else {
+          throw twitterInsertError;
+        }
       }
 
+      console.log('Registration successful for wallet:', wallet_address);
       return NextResponse.json(
         { 
           message: 'Registration successful', 
@@ -133,18 +194,34 @@ export async function POST(request: Request) {
         },
         { status: 200 }
       );
+    } catch (dbError) {
+      console.error('Database error during insert:', dbError);
+      throw dbError; // Re-throw to be caught by outer catch
     } finally {
       // Release the client back to the pool
       client.release();
     }
   } catch (error) {
     console.error('Error storing wallet address:', error);
+    console.error('Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : 'No stack trace'
+    });
     
     // Check if it's a referral limit error
     if (error instanceof Error && error.message.includes('maximum usage limit')) {
       return NextResponse.json(
         { error: 'Referral code has reached maximum usage limit' },
         { status: 400 }
+      );
+    }
+    
+    // Check if it's a database schema error
+    if (error instanceof Error && error.message.includes('column')) {
+      console.error('Database schema error - missing columns?');
+      return NextResponse.json(
+        { error: 'Database configuration error. Please contact support.' },
+        { status: 500 }
       );
     }
     

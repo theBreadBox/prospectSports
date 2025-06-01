@@ -7,84 +7,48 @@ const pool = new Pool({
 });
 
 export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const email = searchParams.get('email');
-  const wallet = searchParams.get('wallet');
-  const referralCode = searchParams.get('code');
-
-  if (!email && !wallet && !referralCode) {
-    return NextResponse.json(
-      { error: 'Must provide either email, wallet address, or referral code' },
-      { status: 400 }
-    );
-  }
-
   try {
+    const { searchParams } = new URL(request.url);
+    const wallet = searchParams.get('wallet');
+
+    if (!wallet) {
+      return NextResponse.json({ error: 'Wallet address is required' }, { status: 400 });
+    }
+
     const client = await pool.connect();
     
     try {
-      let userId;
-      
-      // Find the user by email, wallet, or referral code
-      if (email) {
-        const userResult = await client.query(
-          'SELECT id, email, wallet_address, referral_code FROM prospect_al WHERE email = $1',
-          [email]
-        );
-        userId = userResult.rows[0]?.id;
-      } else if (wallet) {
-        const userResult = await client.query(
-          'SELECT id, email, wallet_address, referral_code FROM prospect_al WHERE wallet_address = $1',
-          [wallet]
-        );
-        userId = userResult.rows[0]?.id;
-      } else if (referralCode) {
-        const userResult = await client.query(
-          'SELECT id, email, wallet_address, referral_code FROM prospect_al WHERE referral_code = $1',
-          [referralCode]
-        );
-        userId = userResult.rows[0]?.id;
-      }
-
-      if (!userId) {
-        return NextResponse.json(
-          { error: 'User not found' },
-          { status: 404 }
-        );
-      }
-
       // Get user's referral stats
-      const statsResult = await client.query(
-        `SELECT 
-          p.email,
-          p.wallet_address,
-          p.referral_code,
-         
-          COUNT(r.id) AS total_referred,
-          5 - COUNT(r.id) AS remaining_uses
-        FROM prospect_al p
-        LEFT JOIN prospect_al r ON r.referred_by = p.referral_code
-        WHERE p.id = $1
-        GROUP BY p.id, p.email, p.wallet_address, p.referral_code`,
-        [userId]
+      const userResult = await client.query(
+        'SELECT wallet_address, email, referral_code FROM prospect_al WHERE wallet_address = $1',
+        [wallet]
       );
 
-      // Get list of users referred by this user
-      const referralsResult = await client.query(
-        `SELECT 
-          r.email AS referred_email,
-          r.wallet_address AS referred_wallet
-        FROM prospect_al p
-        JOIN prospect_al r ON r.referred_by = p.referral_code
-        WHERE p.id = $1`,
-        [userId]
+      if (userResult.rowCount === 0) {
+        return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      }
+
+      const user = userResult.rows[0];
+
+      // Get referred users
+      const referredResult = await client.query(
+        'SELECT email as referred_email, wallet_address as referred_wallet FROM prospect_al WHERE referred_by = $1',
+        [user.referral_code]
       );
+
+      const stats = {
+        email: user.email,
+        wallet_address: user.wallet_address,
+        referral_code: user.referral_code,
+        total_referred: referredResult.rowCount || 0,
+        remaining_uses: Math.max(0, 5 - (referredResult.rowCount || 0))
+      };
 
       return NextResponse.json({
-        stats: statsResult.rows[0],
-        referred_users: referralsResult.rows
+        stats,
+        referred_users: referredResult.rows || []
       });
-      
+
     } finally {
       client.release();
     }

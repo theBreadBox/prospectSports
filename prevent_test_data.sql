@@ -3,8 +3,8 @@ CREATE OR REPLACE FUNCTION check_test_data()
 RETURNS TRIGGER AS $$
 BEGIN
   -- Check if the wallet address or email contains test patterns
-  IF NEW.wallet_address ~ '(?i)(0xapi_test|api_test|test_|staging|dev\.)'
-     OR NEW.email ~ '(?i)(api_test|test_|\.test$|@test\.|test@|staging|dev\.|@dev\.)'
+  IF NEW.wallet_address ~ '(?i)(0xapi_test|api_test|test_wallet|staging|dev\.)'
+     OR NEW.email ~ '(?i)(api_test|test_wallet|\.test$|@testing\.|test@testing|staging|dev\.|@dev\.|@example\.|@fake\.)'
   THEN
     -- Log the blocked attempt
     RAISE LOG 'Blocked test data insertion: wallet=%, email=%', NEW.wallet_address, NEW.email;
