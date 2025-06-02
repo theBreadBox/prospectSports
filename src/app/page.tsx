@@ -38,7 +38,7 @@ interface ReferredUser {
   referred_email: string;
   referred_wallet: string;
 }
-
+//coment for commit
 export default function Home() {
   const { address, status } = useAccount();
   const { disconnect } = useDisconnect();
