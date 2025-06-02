@@ -22,7 +22,7 @@ export async function POST() {
     // Request token data
     const requestTokenURL = 'https://api.twitter.com/oauth/request_token';
     const callbackURL = process.env.NODE_ENV === 'development' 
-      ? 'http://localhost:3000/api/twitter/callback'
+      ? 'https://prospect-sports.vercel.app/api/twitter/callback'
       : 'https://prospect-sports.vercel.app/api/twitter/callback';
 
     const requestData = {
