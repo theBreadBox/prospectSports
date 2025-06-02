@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Menu, X, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import NavLink from '@/components/NavLink';
+import NavLink from './NavLink';
 import SocialIcons from '@/components/SocialIcons';
 import DownloadButtons from '@/components/DownloadButtons';
 

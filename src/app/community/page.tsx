@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Copy, Check } from "lucide-react";
 import dynamic from 'next/dynamic';
+import TwitterSignInButton from '@/components/TwitterButton';
 
 // Dynamic import for ReferralCube to avoid SSR issues with Three.js
 const ReferralCube = dynamic(() => import('@/components/ReferralCube'), {
@@ -36,6 +37,7 @@ export default function CommunityPage() {
   const [referredUsersList, setReferredUsersList] = useState<ReferredUser[]>([]);
   const [codeCopied, setCodeCopied] = useState<boolean>(false);
   const [checkingRegistration, setCheckingRegistration] = useState(true);
+  const [twitterAuthState, setTwitterAuthState] = useState<'initial' | 'pending' | 'success' | 'error'>('initial');
 
   // Check if user is already registered
   useEffect(() => {
@@ -80,6 +82,36 @@ export default function CommunityPage() {
       navigator.clipboard.writeText(`${window.location.origin}/?ref=${userReferralCode}`);
       setCodeCopied(true);
       setTimeout(() => setCodeCopied(false), 2000);
+    }
+  };
+
+  // Handle Twitter OAuth callback
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const oauth_token = params.get('oauth_token');
+    const oauth_verifier = params.get('oauth_verifier');
+
+    if (oauth_token && oauth_verifier) {
+      handleTwitterCallback(oauth_token, oauth_verifier);
+    }
+  }, []);
+
+  const handleTwitterCallback = async (token: string, verifier: string) => {
+    try {
+      const response = await fetch('/api/twitter/callback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ oauth_token: token, oauth_verifier: verifier })
+      });
+
+      if (!response.ok) throw new Error('Twitter callback failed');
+      
+      setTwitterAuthState('success');
+      // Clean up URL params
+      router.replace('/community');
+    } catch (error) {
+      setTwitterAuthState('error');
+      console.error('Twitter callback error:', error);
     }
   };
 
@@ -238,6 +270,13 @@ export default function CommunityPage() {
               />
             </div>
           </div>
+
+          {/* Twitter Sign-In Button */}
+          {twitterAuthState === 'initial' && (
+            <TwitterSignInButton 
+              onSuccess={() => setTwitterAuthState('pending')}
+            />
+          )}
         </div>
       </div>
     </div>

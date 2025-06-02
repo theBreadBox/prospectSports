@@ -10,46 +10,26 @@ interface NavLinkProps {
   className?: string;
 }
 
-const NavLink = ({ href, label, onClick, className }: NavLinkProps) => {
+export default function NavLink({ href, label, onClick, className }: NavLinkProps) {
   const pathname = usePathname();
-  const isActive = pathname === href;
-  
-  // Check if the href is external
   const isExternal = href.startsWith('http');
-
-  const baseStyles = "text-white hover:text-[#4AAEB5] transition-colors font-medium tracking-[.1em] uppercase";
   
-  if (isExternal) {
-    return (
-      <a
-        href={href}
-        onClick={onClick}
-        className={cn(
-          baseStyles,
-          className,
-          isActive && "text-[#4AAEB5]"
-        )}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        {label}
-      </a>
-    );
-  }
+  // For internal links, check if the current pathname matches the href
+  const isActive = !isExternal && pathname === href;
 
   return (
     <Link
       href={href}
       onClick={onClick}
+      target={isExternal ? '_blank' : undefined}
+      rel={isExternal ? 'noopener noreferrer' : undefined}
       className={cn(
-        baseStyles,
-        className,
-        isActive && "text-[#4AAEB5]"
+        "transition-colors duration-200 font-medium tracking-wide uppercase text-[16px]",
+        isActive ? "text-[#4AE5FB]" : "text-white hover:text-[#4AE5FB]",
+        className
       )}
     >
       {label}
     </Link>
   );
-};
-
-export default NavLink;
+}
