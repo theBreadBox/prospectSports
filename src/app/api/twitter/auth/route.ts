@@ -47,6 +47,7 @@ export async function POST() {
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Twitter request token error:', errorText);
+      console.warn('Twitter request callback:', callbackURL);
       throw new Error(`Twitter API error: ${response.status}`);
     }
 
